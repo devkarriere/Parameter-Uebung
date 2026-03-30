@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Übung 3: Mini-Quiz</title>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      .quiz-container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .question-card {
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        transition: border-color 0.3s;
+      }
+
+      .question-card.correct {
+        border-color: #22c55e;
+      }
+
+      .question-card.wrong {
+        border-color: #ef4444;
+      }
+
+      .question-text {
+        font-size: 1.2rem;
+        color: #e2e8f0;
+        margin-bottom: 1rem;
+      }
+
+      .question-number {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .answer-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 0.8rem 1rem;
+        margin: 0.4rem 0;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        color: #e2e8f0;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: background 0.2s, border-color 0.2s;
+      }
+
+      .answer-btn:hover {
+        background: #334155;
+        border-color: #38bdf8;
+      }
+
+      .answer-btn.correct {
+        background: #14532d;
+        border-color: #22c55e;
+        color: #86efac;
+      }
+
+      .answer-btn.wrong {
+        background: #3b1219;
+        border-color: #ef4444;
+        color: #fca5a5;
+      }
+
+      .answer-btn.disabled {
+        cursor: default;
+        opacity: 0.6;
+      }
+
+      .answer-btn.disabled:hover {
+        background: #1e293b;
+        border-color: #334155;
+      }
+
+      .feedback {
+        margin-top: 1rem;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .feedback.correct {
+        background: #14532d;
+        color: #86efac;
+      }
+
+      .feedback.wrong {
+        background: #3b1219;
+        color: #fca5a5;
+      }
+
+      .score-display {
+        text-align: center;
+        padding: 1rem;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        margin: 1rem 0;
+      }
+
+      .score-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f59e0b;
+      }
+
+      .score-text {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: #334155;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: #38bdf8;
+        border-radius: 4px;
+        transition: width 0.3s;
+      }
+
+      .result-screen {
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .result-emoji {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      .result-text {
+        font-size: 1.3rem;
+        color: #e2e8f0;
+        margin-bottom: 0.5rem;
+      }
+
+      .result-score {
+        font-size: 1rem;
+        color: #94a3b8;
+      }
+
+      .next-btn {
+        margin-top: 1rem;
+        background: #22c55e;
+      }
+
+      .next-btn:hover {
+        background: #16a34a;
+      }
+
+      .restart-btn {
+        margin-top: 1rem;
+        background: #f59e0b;
+        color: #0f172a;
+      }
+
+      .restart-btn:hover {
+        background: #d97706;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&Uuml;bung: Das Mini-Quiz</h1>
+      <p class="subtitle">
+        Quiz-App mit Score &ndash; mehrere Komponenten &amp; State-Management
+      </p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Komplexe Aufgabe: Das Mini-Quiz</h2>
+
+        <p>
+          In dieser &Uuml;bung baust du eine Quiz-App mit mehreren Fragen,
+          einem Punkte-System, einem Fortschrittsbalken und einem
+          Ergebnis-Bildschirm. Hier kommen alle Konzepte zusammen!
+        </p>
+
+        <div class="hint">
+          <strong>Vorbereitung:</strong> Erstelle ein neues React-Projekt wie in
+          den vorherigen &Uuml;bungen:
+          <pre><code>npx create-react-app quiz
+cd quiz
+npm start</code></pre>
+          Deinen Code schreibst du wieder in <code>src/App.js</code>.
+        </div>
+
+        <!-- ===== Schritt 1 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>Fragen-Daten vorbereiten</h3>
+          </div>
+
+          <p>
+            Definiere ein Array <code>questions</code> mit mindestens 5 Fragen.
+            Jede Frage ist ein Objekt mit: <code>question</code> (der
+            Fragetext), <code>answers</code> (ein Array mit 4
+            Antwortm&ouml;glichkeiten) und <code>correct</code> (der Index der
+            richtigen Antwort, 0&ndash;3).
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>const questions = [
+  {
+    question: "Wof&uuml;r steht HTML?",
+    answers: [
+      "Hyper Text Markup Language",
+      "High Tech Modern Language",
+      "Hyper Transfer Markup Language",
+      "Home Tool Markup Language"
+    ],
+    correct: 0
+  },
+  {
+    question: "Welche Eigenschaft &auml;ndert die Textfarbe in CSS?",
+    answers: ["font-color", "text-color", "color", "foreground"],
+    correct: 2
+  },
+  {
+    question: "Was macht console.log() in JavaScript?",
+    answers: [
+      "Erstellt eine Datei",
+      "Gibt etwas in der Konsole aus",
+      "Speichert Daten",
+      "&Auml;ndert die Webseite"
+    ],
+    correct: 1
+  },
+  {
+    question: "Wie definiert man eine Variable in modernem JavaScript?",
+    answers: ["var x = 5", "let x = 5", "variable x = 5", "define x = 5"],
+    correct: 1
+  },
+  {
+    question: "Was bedeutet CSS?",
+    answers: [
+      "Computer Style Sheets",
+      "Creative Style System",
+      "Cascading Style Sheets",
+      "Colorful Style Sheets"
+    ],
+    correct: 2
+  }
+];</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 2 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Frage-Komponente (QuestionCard)</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>QuestionCard</code> mit diesen Props:
+            <code>question</code> (der Fragetext), <code>answers</code> (die
+            Antworten) und <code>onAnswer</code> (ein Callback, der beim Klick
+            auf eine Antwort aufgerufen wird). Zeige die Frage und vier
+            Antwort-Buttons an.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function QuestionCard(props) {
+  function handleAnswer(index) {
+    props.onAnswer(index);
+  }
+
+  return (
+    &lt;div className="question-card"&gt;
+      &lt;p className="question-text"&gt;{props.question}&lt;/p&gt;
+      {props.answers.map(function(answer, index) {
+        return (
+          &lt;button
+            key={index}
+            className="answer-btn"
+            onClick={function() { handleAnswer(index); }}
+          &gt;
+            {answer}
+          &lt;/button&gt;
+        );
+      })}
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 3 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>Antwort-Buttons mit Feedback</h3>
+          </div>
+
+          <p>
+            Erweitere <code>QuestionCard</code> um zwei weitere Props:
+            <code>selectedAnswer</code> (der Index der gew&auml;hlten Antwort
+            oder <code>null</code>) und <code>correctAnswer</code> (der Index
+            der richtigen Antwort). Nachdem geantwortet wurde, sollen die
+            Buttons farbig werden: gr&uuml;n f&uuml;r richtig, rot f&uuml;r
+            falsch. Zeige au&szlig;erdem eine Feedback-Nachricht an.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function QuestionCard(props) {
+  let hasAnswered = props.selectedAnswer !== null;
+
+  function getButtonClass(index) {
+    if (!hasAnswered) return "answer-btn";
+
+    if (index === props.correctAnswer) {
+      return "answer-btn correct";
+    }
+    if (index === props.selectedAnswer) {
+      return "answer-btn wrong";
+    }
+    return "answer-btn disabled";
+  }
+
+  function handleAnswer(index) {
+    if (!hasAnswered) {
+      props.onAnswer(index);
+    }
+  }
+
+  return (
+    &lt;div className={"question-card" + (hasAnswered
+      ? (props.selectedAnswer === props.correctAnswer ? " correct" : " wrong")
+      : "")}&gt;
+      &lt;p className="question-text"&gt;{props.question}&lt;/p&gt;
+      {props.answers.map(function(answer, index) {
+        return (
+          &lt;button
+            key={index}
+            className={getButtonClass(index)}
+            onClick={function() { handleAnswer(index); }}
+          &gt;
+            {answer}
+          &lt;/button&gt;
+        );
+      })}
+      {hasAnswered ? (
+        &lt;div className={"feedback " + (props.selectedAnswer === props.correctAnswer ? "correct" : "wrong")}&gt;
+          {props.selectedAnswer === props.correctAnswer
+            ? "Richtig! 🎉"
+            : "Falsch! Die richtige Antwort war: " + props.answers[props.correctAnswer]}
+        &lt;/div&gt;
+      ) : null}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> Die Funktion
+              <code>getButtonClass</code> entscheidet f&uuml;r jeden Button,
+              welche CSS-Klasse er bekommt. Das ist eine gute Methode, um
+              komplexe bedingte Logik aus dem JSX herauszuhalten.
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 4 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>Score-Anzeige (ScoreDisplay)</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>ScoreDisplay</code> mit den Props
+            <code>score</code> und <code>total</code>. Zeige die aktuelle
+            Punktzahl an.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function ScoreDisplay(props) {
+  return (
+    &lt;div className="score-display"&gt;
+      &lt;div className="score-number"&gt;{props.score} / {props.total}&lt;/div&gt;
+      &lt;div className="score-text"&gt;Richtige Antworten&lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 5 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>Fortschrittsbalken (ProgressBar)</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>ProgressBar</code> mit den Props
+            <code>current</code> und <code>total</code>. Berechne die Breite in
+            Prozent und setze sie als <code>style</code>.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function ProgressBar(props) {
+  let percent = (props.current / props.total) * 100;
+
+  return (
+    &lt;div className="progress-bar"&gt;
+      &lt;div
+        className="progress-fill"
+        style={{width: percent + "%"}}
+      &gt;&lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <div class="hint">
+              <strong>Tipp:</strong> In JSX schreibst du Inline-Styles als
+              Objekt: <code>style={{width: percent + "%"}}</code>. Beachte die
+              doppelten geschweiften Klammern &ndash; die &auml;u&szlig;eren
+              sagen &bdquo;hier kommt JavaScript&ldquo;, die inneren definieren
+              das Objekt.
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 6 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">6</span>
+            <h3>Quiz-App zusammenbauen</h3>
+          </div>
+
+          <p>
+            Erstelle die Hauptkomponente <code>QuizApp</code>. Du brauchst
+            mehrere <code>useState</code>-Aufrufe:
+          </p>
+          <ul style="margin-bottom: 0.8rem; padding-left: 1.5rem">
+            <li><code>currentQuestion</code> &ndash; Index der aktuellen Frage (Start: 0)</li>
+            <li><code>score</code> &ndash; Punktestand (Start: 0)</li>
+            <li><code>selectedAnswer</code> &ndash; Gew&auml;hlte Antwort (Start: null)</li>
+            <li><code>isFinished</code> &ndash; Quiz beendet? (Start: false)</li>
+          </ul>
+          <p>
+            Schreibe eine Funktion <code>handleAnswer</code>, die pr&uuml;ft ob
+            die Antwort richtig ist und den Score aktualisiert. Und eine
+            Funktion <code>handleNext</code>, die zur n&auml;chsten Frage
+            weitergeht oder das Quiz beendet.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>import { useState } from "react";
+
+function QuizApp() {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isFinished, setIsFinished] = useState(false);
+
+  let question = questions[currentQuestion];
+
+  function handleAnswer(answerIndex) {
+    setSelectedAnswer(answerIndex);
+    if (answerIndex === question.correct) {
+      setScore(score + 1);
+    }
+  }
+
+  function handleNext() {
+    if (currentQuestion + 1 &lt; questions.length) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+    } else {
+      setIsFinished(true);
+    }
+  }
+
+  function handleRestart() {
+    setCurrentQuestion(0);
+    setScore(0);
+    setSelectedAnswer(null);
+    setIsFinished(false);
+  }
+
+  if (isFinished) {
+    return (
+      &lt;div className="quiz-container"&gt;
+        &lt;ResultScreen
+          score={score}
+          total={questions.length}
+          onRestart={handleRestart}
+        /&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  return (
+    &lt;div className="quiz-container"&gt;
+      &lt;ProgressBar
+        current={currentQuestion + 1}
+        total={questions.length}
+      /&gt;
+      &lt;p className="question-number"&gt;
+        Frage {currentQuestion + 1} von {questions.length}
+      &lt;/p&gt;
+      &lt;ScoreDisplay score={score} total={questions.length} /&gt;
+      &lt;QuestionCard
+        question={question.question}
+        answers={question.answers}
+        correctAnswer={question.correct}
+        selectedAnswer={selectedAnswer}
+        onAnswer={handleAnswer}
+      /&gt;
+      {selectedAnswer !== null ? (
+        &lt;button className="next-btn" onClick={handleNext}&gt;
+          {currentQuestion + 1 &lt; questions.length
+            ? "N&auml;chste Frage"
+            : "Ergebnis anzeigen"}
+        &lt;/button&gt;
+      ) : null}
+    &lt;/div&gt;
+  );
+}
+
+export default QuizApp;</code></pre>
+
+            <div class="call-chain">
+              <h4>Komponenten-Baum:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  QuizApp (State: currentQuestion, score, selectedAnswer,
+                  isFinished)
+                  <div class="chain-item sub-fn">
+                    ProgressBar (Props: current, total)
+                  </div>
+                  <div class="chain-item sub-fn">
+                    ScoreDisplay (Props: score, total)
+                  </div>
+                  <div class="chain-item sub-fn">
+                    QuestionCard (Props: question, answers, correctAnswer,
+                    selectedAnswer, onAnswer)
+                    <div class="chain-item sub-fn-deep">
+                      Klick! &rarr; props.onAnswer(index) &rarr;
+                      handleAnswer(index) &rarr; setScore, setSelectedAnswer
+                    </div>
+                  </div>
+                  <div class="chain-item sub-fn">
+                    ResultScreen (Props: score, total, onRestart) &ndash; wenn
+                    isFinished
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 7 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">7</span>
+            <h3>Ergebnis-Bildschirm (ResultScreen)</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>ResultScreen</code> mit den Props
+            <code>score</code>, <code>total</code> und
+            <code>onRestart</code> (Callback f&uuml;r den Neustart-Button).
+            Zeige ein Emoji und eine Nachricht basierend auf dem Ergebnis:
+            80%+ = Feier-Emoji, 50%+ = Daumen hoch, darunter = Ermutigend.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function ResultScreen(props) {
+  let percent = (props.score / props.total) * 100;
+  let emoji;
+  let message;
+
+  if (percent &gt;= 80) {
+    emoji = "🎉";
+    message = "Ausgezeichnet! Du bist ein Profi!";
+  } else if (percent &gt;= 50) {
+    emoji = "👍";
+    message = "Gut gemacht! Weiter so!";
+  } else {
+    emoji = "💪";
+    message = "&Uuml;be weiter, du schaffst das!";
+  }
+
+  return (
+    &lt;div className="result-screen"&gt;
+      &lt;div className="result-emoji"&gt;{emoji}&lt;/div&gt;
+      &lt;p className="result-text"&gt;{message}&lt;/p&gt;
+      &lt;p className="result-score"&gt;
+        {props.score} von {props.total} Fragen richtig ({Math.round(percent)}%)
+      &lt;/p&gt;
+      &lt;button className="restart-btn" onClick={props.onRestart}&gt;
+        Quiz neu starten
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Bonus ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Zuf&auml;llige Fragen-Reihenfolge</h3>
+          </div>
+
+          <p>
+            Mische die Fragen bei jedem Quiz-Start zuf&auml;llig durch. Erstelle
+            daf&uuml;r eine Funktion <code>shuffleArray</code>, die ein neues,
+            gemischtes Array zur&uuml;ckgibt. Speichere die gemischten Fragen
+            als State.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function shuffleArray(array) {
+  let shuffled = [...array];
+  for (let i = shuffled.length - 1; i &gt; 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    let temp = shuffled[i];
+    shuffled[i] = shuffled[j];
+    shuffled[j] = temp;
+  }
+  return shuffled;
+}
+
+// In QuizApp:
+const [shuffledQuestions, setShuffledQuestions] =
+  useState(shuffleArray(questions));
+
+// Nutze shuffledQuestions statt questions:
+let question = shuffledQuestions[currentQuestion];
+
+// Bei handleRestart auch neu mischen:
+function handleRestart() {
+  setShuffledQuestions(shuffleArray(questions));
+  setCurrentQuestion(0);
+  setScore(0);
+  setSelectedAnswer(null);
+  setIsFinished(false);
+}</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Live-Demo ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+
+          <p>
+            Spiele das fertige Quiz! Beantworte die Fragen und sieh dir dein
+            Ergebnis an.
+          </p>
+
+          <div id="react-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script type="text/babel">
+      const questions = [
+        {
+          question: "Wofür steht HTML?",
+          answers: [
+            "Hyper Text Markup Language",
+            "High Tech Modern Language",
+            "Hyper Transfer Markup Language",
+            "Home Tool Markup Language",
+          ],
+          correct: 0,
+        },
+        {
+          question: "Welche Eigenschaft ändert die Textfarbe in CSS?",
+          answers: ["font-color", "text-color", "color", "foreground"],
+          correct: 2,
+        },
+        {
+          question: "Was macht console.log() in JavaScript?",
+          answers: [
+            "Erstellt eine Datei",
+            "Gibt etwas in der Konsole aus",
+            "Speichert Daten",
+            "Ändert die Webseite",
+          ],
+          correct: 1,
+        },
+        {
+          question: "Wie definiert man eine Variable in modernem JavaScript?",
+          answers: [
+            "var x = 5",
+            "let x = 5",
+            "variable x = 5",
+            "define x = 5",
+          ],
+          correct: 1,
+        },
+        {
+          question: "Was bedeutet CSS?",
+          answers: [
+            "Computer Style Sheets",
+            "Creative Style System",
+            "Cascading Style Sheets",
+            "Colorful Style Sheets",
+          ],
+          correct: 2,
+        },
+      ];
+
+      function ProgressBar(props) {
+        let percent = (props.current / props.total) * 100;
+        return (
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: percent + "%" }}
+            ></div>
+          </div>
+        );
+      }
+
+      function ScoreDisplay(props) {
+        return (
+          <div className="score-display">
+            <div className="score-number">
+              {props.score} / {props.total}
+            </div>
+            <div className="score-text">Richtige Antworten</div>
+          </div>
+        );
+      }
+
+      function QuestionCard(props) {
+        let hasAnswered = props.selectedAnswer !== null;
+
+        function getButtonClass(index) {
+          if (!hasAnswered) return "answer-btn";
+          if (index === props.correctAnswer) return "answer-btn correct";
+          if (index === props.selectedAnswer) return "answer-btn wrong";
+          return "answer-btn disabled";
+        }
+
+        function handleAnswer(index) {
+          if (!hasAnswered) {
+            props.onAnswer(index);
+          }
+        }
+
+        return (
+          <div
+            className={
+              "question-card" +
+              (hasAnswered
+                ? props.selectedAnswer === props.correctAnswer
+                  ? " correct"
+                  : " wrong"
+                : "")
+            }
+          >
+            <p className="question-text">{props.question}</p>
+            {props.answers.map(function (answer, index) {
+              return (
+                <button
+                  key={index}
+                  className={getButtonClass(index)}
+                  onClick={function () {
+                    handleAnswer(index);
+                  }}
+                >
+                  {answer}
+                </button>
+              );
+            })}
+            {hasAnswered ? (
+              <div
+                className={
+                  "feedback " +
+                  (props.selectedAnswer === props.correctAnswer
+                    ? "correct"
+                    : "wrong")
+                }
+              >
+                {props.selectedAnswer === props.correctAnswer
+                  ? "Richtig! 🎉"
+                  : "Falsch! Die richtige Antwort war: " +
+                    props.answers[props.correctAnswer]}
+              </div>
+            ) : null}
+          </div>
+        );
+      }
+
+      function ResultScreen(props) {
+        let percent = (props.score / props.total) * 100;
+        let emoji;
+        let message;
+
+        if (percent >= 80) {
+          emoji = "🎉";
+          message = "Ausgezeichnet! Du bist ein Profi!";
+        } else if (percent >= 50) {
+          emoji = "👍";
+          message = "Gut gemacht! Weiter so!";
+        } else {
+          emoji = "💪";
+          message = "Übe weiter, du schaffst das!";
+        }
+
+        return (
+          <div className="result-screen">
+            <div className="result-emoji">{emoji}</div>
+            <p className="result-text">{message}</p>
+            <p className="result-score">
+              {props.score} von {props.total} Fragen richtig (
+              {Math.round(percent)}%)
+            </p>
+            <button className="restart-btn" onClick={props.onRestart}>
+              Quiz neu starten
+            </button>
+          </div>
+        );
+      }
+
+      function QuizApp() {
+        const [currentQuestion, setCurrentQuestion] = React.useState(0);
+        const [score, setScore] = React.useState(0);
+        const [selectedAnswer, setSelectedAnswer] = React.useState(null);
+        const [isFinished, setIsFinished] = React.useState(false);
+
+        let question = questions[currentQuestion];
+
+        function handleAnswer(answerIndex) {
+          setSelectedAnswer(answerIndex);
+          if (answerIndex === question.correct) {
+            setScore(score + 1);
+          }
+        }
+
+        function handleNext() {
+          if (currentQuestion + 1 < questions.length) {
+            setCurrentQuestion(currentQuestion + 1);
+            setSelectedAnswer(null);
+          } else {
+            setIsFinished(true);
+          }
+        }
+
+        function handleRestart() {
+          setCurrentQuestion(0);
+          setScore(0);
+          setSelectedAnswer(null);
+          setIsFinished(false);
+        }
+
+        if (isFinished) {
+          return (
+            <div className="quiz-container">
+              <ResultScreen
+                score={score}
+                total={questions.length}
+                onRestart={handleRestart}
+              />
+            </div>
+          );
+        }
+
+        return (
+          <div className="quiz-container">
+            <ProgressBar
+              current={currentQuestion + 1}
+              total={questions.length}
+            />
+            <p className="question-number">
+              Frage {currentQuestion + 1} von {questions.length}
+            </p>
+            <ScoreDisplay score={score} total={questions.length} />
+            <QuestionCard
+              question={question.question}
+              answers={question.answers}
+              correctAnswer={question.correct}
+              selectedAnswer={selectedAnswer}
+              onAnswer={handleAnswer}
+            />
+            {selectedAnswer !== null ? (
+              <button className="next-btn" onClick={handleNext}>
+                {currentQuestion + 1 < questions.length
+                  ? "Nächste Frage"
+                  : "Ergebnis anzeigen"}
+              </button>
+            ) : null}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("react-root"));
+      root.render(<QuizApp />);
+    </script>
+  </body>
+</html>

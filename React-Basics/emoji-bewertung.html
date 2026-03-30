@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Übung 2: Emoji-Bewertung</title>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      .rating-display {
+        text-align: center;
+        padding: 1.5rem;
+        margin: 1rem 0;
+      }
+
+      .emoji-row {
+        display: flex;
+        justify-content: center;
+        gap: 0.8rem;
+        margin: 1rem 0;
+      }
+
+      .emoji-btn {
+        font-size: 2.5rem;
+        background: none;
+        border: 3px solid transparent;
+        border-radius: 12px;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: transform 0.2s, border-color 0.2s;
+        opacity: 0.5;
+      }
+
+      .emoji-btn:hover {
+        transform: scale(1.2);
+        opacity: 0.8;
+        background: none;
+      }
+
+      .emoji-btn.selected {
+        border-color: #f59e0b;
+        opacity: 1;
+        transform: scale(1.2);
+        background: none;
+      }
+
+      .rating-label {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+      }
+
+      .rating-label.bad {
+        color: #ef4444;
+      }
+
+      .rating-label.ok {
+        color: #f59e0b;
+      }
+
+      .rating-label.good {
+        color: #22c55e;
+      }
+
+      .review-card {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .review-emoji {
+        font-size: 1.5rem;
+      }
+
+      .review-text {
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+
+      .average-display {
+        text-align: center;
+        padding: 1rem;
+        background: #14532d;
+        border-radius: 8px;
+        color: #86efac;
+        font-size: 1.2rem;
+        margin-top: 1rem;
+      }
+
+      .no-reviews {
+        text-align: center;
+        color: #64748b;
+        padding: 1rem;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&Uuml;bung: Die Emoji-Bewertung</h1>
+      <p class="subtitle">
+        Bewertungen mit Emojis &ndash; Props, bedingte Anzeige &amp; Callbacks
+      </p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Aufbauende Aufgabe: Die Emoji-Bewertung</h2>
+
+        <p>
+          In dieser &Uuml;bung baust du ein Bewertungssystem mit Emojis. Nutzer
+          k&ouml;nnen eine Bewertung von 1 bis 5 abgeben, vergangene Bewertungen
+          sehen und den Durchschnitt berechnen.
+        </p>
+
+        <div class="hint">
+          <strong>Vorbereitung:</strong> Erstelle ein neues React-Projekt wie in
+          &Uuml;bung 1:
+          <pre><code>npx create-react-app bewertung
+cd bewertung
+npm start</code></pre>
+          Deinen Code schreibst du wieder in <code>src/App.js</code>.
+        </div>
+
+        <!-- ===== Schritt 1 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>Emoji-Anzeige als Komponente</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>EmojiDisplay</code>, die eine Prop
+            <code>rating</code> (Zahl von 1 bis 5) bekommt und das passende
+            Emoji anzeigt. Nutze <code>if/else</code> f&uuml;r die Zuordnung.
+          </p>
+
+          <p>
+            Emoji-Zuordnung: 1 = 😡, 2 = 😕, 3 = 😐, 4 = 🙂,
+            5 = 😍
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function EmojiDisplay(props) {
+  let emoji;
+  if (props.rating === 1) {
+    emoji = "😡";
+  } else if (props.rating === 2) {
+    emoji = "😕";
+  } else if (props.rating === 3) {
+    emoji = "😐";
+  } else if (props.rating === 4) {
+    emoji = "🙂";
+  } else if (props.rating === 5) {
+    emoji = "😍";
+  } else {
+    emoji = "❓";
+  }
+
+  return &lt;span style={{fontSize: "3rem"}}&gt;{emoji}&lt;/span&gt;;
+}</code></pre>
+
+            <div class="hint">
+              <strong>Tipp:</strong> Teste die Komponente mit verschiedenen
+              Werten: <code>&lt;EmojiDisplay rating={3} /&gt;</code>. Denk
+              daran, dass Zahlen in geschweiften Klammern stehen!
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 2 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Bewertungslabel mit bedingter Anzeige</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>RatingLabel</code>, die eine Prop
+            <code>rating</code> bekommt und einen Text mit passender Farbe
+            anzeigt: 1&ndash;2 = "Schlecht" (rot), 3 = "Geht so" (orange),
+            4&ndash;5 = "Super!" (gr&uuml;n).
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function RatingLabel(props) {
+  let text;
+  let colorClass;
+
+  if (props.rating &lt;= 2) {
+    text = "Schlecht";
+    colorClass = "bad";
+  } else if (props.rating === 3) {
+    text = "Geht so";
+    colorClass = "ok";
+  } else {
+    text = "Super!";
+    colorClass = "good";
+  }
+
+  return &lt;p className={"rating-label " + colorClass}&gt;{text}&lt;/p&gt;;
+}</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> Die CSS-Klasse wird dynamisch
+              zusammengesetzt: <code>{"rating-label " + colorClass}</code>. So
+              &auml;ndert sich die Farbe je nach Bewertung.
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 3 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>Klickbare Emoji-Buttons</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>EmojiSelector</code> mit zwei Props:
+            <code>onSelect</code> (eine Callback-Funktion) und
+            <code>selected</code> (die aktuelle Auswahl). Zeige 5 Emoji-Buttons.
+            Beim Klick wird <code>props.onSelect(wert)</code> aufgerufen. Der
+            ausgew&auml;hlte Button bekommt die Klasse <code>selected</code>.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function EmojiSelector(props) {
+  const emojis = ["😡", "😕", "😐", "🙂", "😍"];
+
+  function handleClick(value) {
+    props.onSelect(value);
+  }
+
+  return (
+    &lt;div className="emoji-row"&gt;
+      {emojis.map(function(emoji, index) {
+        let value = index + 1;
+        return (
+          &lt;button
+            key={value}
+            className={"emoji-btn" + (props.selected === value ? " selected" : "")}
+            onClick={function() { handleClick(value); }}
+          &gt;
+            {emoji}
+          &lt;/button&gt;
+        );
+      })}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag callback"
+                  >onClick <small>Klick auf 🙂</small></span
+                >
+                <span class="arrow">&rarr;</span>
+                <span class="tag prop"
+                  >props.onSelect(4) <small>Callback</small></span
+                >
+                <span class="arrow">&rarr;</span>
+                <span class="tag state"
+                  >setRating(4) <small>im Eltern</small></span
+                >
+              </div>
+              <p class="caption">
+                Der Klick l&ouml;st den Callback aus, der den State im
+                Eltern-Element &auml;ndert.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 4 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>useState f&uuml;r die Bewertung</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>RatingWidget</code>, die alles
+            zusammenbringt. Verwende <code>useState</code> f&uuml;r die aktuelle
+            Bewertung (Startwert: 0). &Uuml;bergib <code>setRating</code> als
+            Callback an <code>EmojiSelector</code> und die
+            <code>rating</code>-Variable als Prop an <code>EmojiDisplay</code>
+            und <code>RatingLabel</code>.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>import { useState } from "react";
+
+function RatingWidget() {
+  const [rating, setRating] = useState(0);
+
+  return (
+    &lt;div className="rating-display"&gt;
+      &lt;h3&gt;Wie findest du es?&lt;/h3&gt;
+      &lt;EmojiSelector selected={rating} onSelect={setRating} /&gt;
+      {rating &gt; 0 ? (
+        &lt;div&gt;
+          &lt;EmojiDisplay rating={rating} /&gt;
+          &lt;RatingLabel rating={rating} /&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;p style={{color: "#64748b"}}&gt;W&auml;hle eine Bewertung...&lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default RatingWidget;</code></pre>
+
+            <div class="hint">
+              <strong>Neu hier:</strong> Der Ausdruck
+              <code>{rating &gt; 0 ? (...) : (...)}</code> zeigt die
+              Emoji-Anzeige nur, wenn eine Bewertung ausgew&auml;hlt wurde.
+              Sonst erscheint ein Platzhalter-Text.
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 5 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>Bewertungsliste mit mehreren Bewertungen</h3>
+          </div>
+
+          <p>
+            Erweitere <code>RatingWidget</code> um einen zweiten State
+            <code>reviews</code> (ein leeres Array als Startwert). F&uuml;ge
+            einen Button "Bewertung abgeben" hinzu. Beim Klick wird die aktuelle
+            Bewertung zum Array hinzugef&uuml;gt. Zeige alle abgegebenen
+            Bewertungen als Liste an.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>import { useState } from "react";
+
+function RatingWidget() {
+  const [rating, setRating] = useState(0);
+  const [reviews, setReviews] = useState([]);
+
+  function handleSubmit() {
+    if (rating === 0) return;
+    setReviews([...reviews, rating]);
+    setRating(0);
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;div className="rating-display"&gt;
+        &lt;h3&gt;Wie findest du es?&lt;/h3&gt;
+        &lt;EmojiSelector selected={rating} onSelect={setRating} /&gt;
+        {rating &gt; 0 ? (
+          &lt;div&gt;
+            &lt;EmojiDisplay rating={rating} /&gt;
+            &lt;RatingLabel rating={rating} /&gt;
+            &lt;button onClick={handleSubmit}&gt;Bewertung abgeben&lt;/button&gt;
+          &lt;/div&gt;
+        ) : (
+          &lt;p style={{color: "#64748b"}}&gt;W&auml;hle eine Bewertung...&lt;/p&gt;
+        )}
+      &lt;/div&gt;
+
+      &lt;h3 style={{color: "#94a3b8", marginTop: "1.5rem"}}&gt;
+        Bisherige Bewertungen ({reviews.length}):
+      &lt;/h3&gt;
+      {reviews.length === 0 ? (
+        &lt;p className="no-reviews"&gt;Noch keine Bewertungen abgegeben.&lt;/p&gt;
+      ) : (
+        reviews.map(function(rev, index) {
+          return (
+            &lt;div className="review-card" key={index}&gt;
+              &lt;span className="review-emoji"&gt;
+                &lt;EmojiDisplay rating={rev} /&gt;
+              &lt;/span&gt;
+              &lt;span className="review-text"&gt;
+                Bewertung #{index + 1}: {rev} von 5
+              &lt;/span&gt;
+            &lt;/div&gt;
+          );
+        })
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <div class="hint">
+              <strong>Wichtig:</strong> <code>[...reviews, rating]</code>
+              erstellt ein <strong>neues Array</strong> mit allen bisherigen
+              Bewertungen plus der neuen. In React darfst du ein Array nie
+              direkt ver&auml;ndern (z.B. mit <code>push</code>), sondern
+              musst immer ein neues Array erstellen!
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 6 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">6</span>
+            <h3>Durchschnitt berechnen und anzeigen</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>AverageDisplay</code>, die eine Prop
+            <code>reviews</code> (das Array der Bewertungen) bekommt. Berechne
+            den Durchschnitt und zeige ihn an. Verwende die Komponente in
+            <code>RatingWidget</code>.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>function AverageDisplay(props) {
+  if (props.reviews.length === 0) {
+    return null;
+  }
+
+  let total = 0;
+  for (let i = 0; i &lt; props.reviews.length; i++) {
+    total = total + props.reviews[i];
+  }
+  let average = total / props.reviews.length;
+
+  return (
+    &lt;div className="average-display"&gt;
+      Durchschnitt: {average.toFixed(1)} von 5
+      &lt;span style={{marginLeft: "0.5rem"}}&gt;
+        &lt;EmojiDisplay rating={Math.round(average)} /&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  );
+}
+
+// In RatingWidget nach der Bewertungsliste einf&uuml;gen:
+&lt;AverageDisplay reviews={reviews} /&gt;</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Bonus ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Kommentar zur Bewertung</h3>
+          </div>
+
+          <p>
+            F&uuml;ge ein Eingabefeld f&uuml;r einen Kommentar hinzu. Speichere
+            die Bewertungen als Objekte: <code>{rating: 4, comment: "Sehr
+            gut!"}</code>. Zeige den Kommentar in der Bewertungsliste an.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>// Neuer State f&uuml;r den Kommentar:
+const [comment, setComment] = useState("");
+
+function handleCommentChange(event) {
+  setComment(event.target.value);
+}
+
+// Eingabefeld im Formular:
+&lt;div className="form-group" style={{marginTop: "0.5rem"}}&gt;
+  &lt;input
+    type="text"
+    value={comment}
+    onChange={handleCommentChange}
+    placeholder="Kommentar (optional)..."
+  /&gt;
+&lt;/div&gt;
+
+// handleSubmit anpassen:
+function handleSubmit() {
+  if (rating === 0) return;
+  setReviews([...reviews, {rating: rating, comment: comment}]);
+  setRating(0);
+  setComment("");
+}
+
+// In der Bewertungsliste:
+&lt;span className="review-text"&gt;
+  Bewertung #{index + 1}: {rev.rating} von 5
+  {rev.comment ? " – " + rev.comment : ""}
+&lt;/span&gt;</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Live-Demo ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+
+          <p>
+            So sieht die fertige Emoji-Bewertung aus. Klicke auf ein Emoji und
+            gib Bewertungen ab!
+          </p>
+
+          <div id="react-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script type="text/babel">
+      function EmojiDisplay(props) {
+        let emoji;
+        if (props.rating === 1) {
+          emoji = "😡";
+        } else if (props.rating === 2) {
+          emoji = "😕";
+        } else if (props.rating === 3) {
+          emoji = "😐";
+        } else if (props.rating === 4) {
+          emoji = "🙂";
+        } else if (props.rating === 5) {
+          emoji = "😍";
+        } else {
+          emoji = "❓";
+        }
+        return <span style={{ fontSize: "2rem" }}>{emoji}</span>;
+      }
+
+      function RatingLabel(props) {
+        let text;
+        let colorClass;
+        if (props.rating <= 2) {
+          text = "Schlecht";
+          colorClass = "bad";
+        } else if (props.rating === 3) {
+          text = "Geht so";
+          colorClass = "ok";
+        } else {
+          text = "Super!";
+          colorClass = "good";
+        }
+        return <p className={"rating-label " + colorClass}>{text}</p>;
+      }
+
+      function EmojiSelector(props) {
+        const emojis = ["😡", "😕", "😐", "🙂", "😍"];
+
+        function handleClick(value) {
+          props.onSelect(value);
+        }
+
+        return (
+          <div className="emoji-row">
+            {emojis.map(function (emoji, index) {
+              let value = index + 1;
+              return (
+                <button
+                  key={value}
+                  className={
+                    "emoji-btn" +
+                    (props.selected === value ? " selected" : "")
+                  }
+                  onClick={function () {
+                    handleClick(value);
+                  }}
+                >
+                  {emoji}
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
+
+      function AverageDisplay(props) {
+        if (props.reviews.length === 0) return null;
+        let total = 0;
+        for (let i = 0; i < props.reviews.length; i++) {
+          total = total + props.reviews[i];
+        }
+        let average = total / props.reviews.length;
+        return (
+          <div className="average-display">
+            Durchschnitt: {average.toFixed(1)} von 5{" "}
+            <EmojiDisplay rating={Math.round(average)} />
+          </div>
+        );
+      }
+
+      function RatingWidget() {
+        const [rating, setRating] = React.useState(0);
+        const [reviews, setReviews] = React.useState([]);
+
+        function handleSubmit() {
+          if (rating === 0) return;
+          setReviews([...reviews, rating]);
+          setRating(0);
+        }
+
+        return (
+          <div>
+            <div className="rating-display">
+              <h3>Wie findest du es?</h3>
+              <EmojiSelector selected={rating} onSelect={setRating} />
+              {rating > 0 ? (
+                <div>
+                  <EmojiDisplay rating={rating} />
+                  <RatingLabel rating={rating} />
+                  <button onClick={handleSubmit}>Bewertung abgeben</button>
+                </div>
+              ) : (
+                <p style={{ color: "#64748b" }}>Wähle eine Bewertung...</p>
+              )}
+            </div>
+
+            <h3 style={{ color: "#94a3b8", marginTop: "1.5rem" }}>
+              Bisherige Bewertungen ({reviews.length}):
+            </h3>
+            {reviews.length === 0 ? (
+              <p className="no-reviews">
+                Noch keine Bewertungen abgegeben.
+              </p>
+            ) : (
+              reviews.map(function (rev, index) {
+                return (
+                  <div className="review-card" key={index}>
+                    <span className="review-emoji">
+                      <EmojiDisplay rating={rev} />
+                    </span>
+                    <span className="review-text">
+                      Bewertung #{index + 1}: {rev} von 5
+                    </span>
+                  </div>
+                );
+              })
+            )}
+
+            <AverageDisplay reviews={reviews} />
+          </div>
+        );
+      }
+
+      function App() {
+        return (
+          <div>
+            <RatingWidget />
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("react-root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

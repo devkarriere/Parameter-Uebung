@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Basics</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>React Basics</h1>
+      <p class="subtitle">
+        Komponenten, Props, State &amp; Callbacks &ndash; deine ersten Schritte
+        mit React
+      </p>
+    </header>
+
+    <main>
+      <!-- ==================== Sektion 1 ==================== -->
+      <section class="card">
+        <h2>1. Was ist eine Komponente?</h2>
+
+        <p>
+          Stell dir <strong>Lego-Bausteine</strong> vor. Jeder Baustein hat eine
+          bestimmte Form und Farbe. Du kannst sie immer wieder verwenden und
+          zusammenstecken. React-<strong>Komponenten</strong> sind wie digitale
+          Lego-Bausteine f&uuml;r deine Webseite.
+        </p>
+
+        <p>
+          Eine Komponente ist eine <strong>Funktion</strong>, die sichtbare
+          Elemente zur&uuml;ckgibt. Diese spezielle Schreibweise hei&szlig;t
+          <strong>JSX</strong> &ndash; sie sieht aus wie HTML, ist aber
+          JavaScript.
+        </p>
+
+        <pre><code>// Eine einfache Komponente
+function Greeting() {
+  return &lt;h1&gt;Hallo, Welt!&lt;/h1&gt;;
+}
+
+// So wird sie im Browser angezeigt:
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(&lt;Greeting /&gt;);</code></pre>
+
+        <p>
+          Wichtig: Der Funktionsname muss mit einem
+          <strong>Gro&szlig;buchstaben</strong> anfangen. So wei&szlig; React,
+          dass es sich um eine Komponente handelt und nicht um ein normales
+          HTML-Element.
+        </p>
+
+        <div class="component-tree">
+          <div class="component-box parent">
+            <span class="label">App (Eltern-Komponente)</span>
+            <code>&lt;Greeting /&gt;</code>
+            <div class="component-box child">
+              <span class="label">Greeting (Kind-Komponente)</span>
+              <code>&lt;h1&gt;Hallo, Welt!&lt;/h1&gt;</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">
+          <strong>Merke:</strong> Eine Komponente ist eine Funktion, die JSX
+          zur&uuml;ckgibt. JSX sieht aus wie HTML, ist aber JavaScript. Der
+          Funktionsname muss mit einem <strong>Gro&szlig;buchstaben</strong>
+          anfangen.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 2 ==================== -->
+      <section class="card">
+        <h2>2. Props &ndash; Daten an Komponenten &uuml;bergeben</h2>
+
+        <p>
+          Du kennst schon <strong>Parameter</strong> bei Funktionen. Props sind
+          das Gleiche &ndash; nur f&uuml;r Komponenten! Wenn die Komponente ein
+          Briefkasten ist, sind Props die Briefe, die du hineinwirfst.
+        </p>
+
+        <p>
+          <strong>Props</strong> (kurz f&uuml;r &bdquo;Properties&ldquo;, also
+          Eigenschaften) werden beim Verwenden der Komponente &uuml;bergeben. Die
+          Komponente empf&auml;ngt sie als ein einziges Objekt.
+        </p>
+
+        <pre><code>function Greeting(props) {
+  return &lt;h1&gt;Hallo, {props.name}!&lt;/h1&gt;;
+}
+
+// Aufruf mit verschiedenen Props:
+&lt;Greeting name="Anna" /&gt;   // zeigt: Hallo, Anna!
+&lt;Greeting name="Max" /&gt;    // zeigt: Hallo, Max!</code></pre>
+
+        <p>
+          Statt jedes Mal <code>props.name</code> zu schreiben, kannst du die
+          Werte direkt in der Klammer &bdquo;auspacken&ldquo;. Das nennt man
+          <strong>Destrukturierung</strong> &ndash; du holst dir genau die
+          Eigenschaften heraus, die du brauchst:
+        </p>
+
+        <pre><code>// Vorher: props als ganzes Objekt
+function Greeting(props) {
+  return &lt;h1&gt;Hallo, {props.name}!&lt;/h1&gt;;
+}
+
+// Nachher: direkt destrukturiert &ndash; k&uuml;rzer und &uuml;bersichtlicher
+function Greeting({ name }) {
+  return &lt;h1&gt;Hallo, {name}!&lt;/h1&gt;;
+}
+
+// Funktioniert genauso mit mehreren Props:
+function ProfileCard({ name, age, city }) {
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;{name}&lt;/h2&gt;
+      &lt;p&gt;Alter: {age}&lt;/p&gt;
+      &lt;p&gt;Stadt: {city}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <div class="hint">
+          <strong>Merke:</strong> Die geschweiften Klammern <code>{ }</code> in
+          <code>function Greeting({ name })</code> sind
+          <strong>Destrukturierung</strong>. Du sagst damit: &bdquo;Nimm aus dem
+          Props-Objekt die Eigenschaft <code>name</code> und speichere sie direkt
+          als Variable.&ldquo; Das Ergebnis ist das Gleiche &ndash; nur k&uuml;rzer.
+          In der Praxis wirst du fast immer diese Schreibweise sehen.
+        </div>
+
+        <div class="visual">
+          <div class="flow">
+            <span class="tag var"
+              >name="Anna" <small>Attribut</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag prop"
+              >props.name <small>"Anna"</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag jsx"
+              >{props.name} <small>im JSX</small></span
+            >
+          </div>
+          <p class="caption">
+            Das Attribut <code>name</code> wird zum <code>props.name</code> in
+            der Komponente.
+          </p>
+        </div>
+
+        <p>Du kannst auch <strong>mehrere Props</strong> &uuml;bergeben:</p>
+
+        <pre><code>function ProfileCard(props) {
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;{props.name}&lt;/h2&gt;
+      &lt;p&gt;Alter: {props.age}&lt;/p&gt;
+      &lt;p&gt;Stadt: {props.city}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Texte in Anf&uuml;hrungszeichen, Zahlen in geschweiften Klammern:
+&lt;ProfileCard name="Lisa" age={28} city="Berlin" /&gt;</code></pre>
+
+        <div class="hint">
+          <strong>Merke:</strong> Props werden wie HTML-Attribute &uuml;bergeben.
+          Texte stehen in Anf&uuml;hrungszeichen, Zahlen und Variablen in
+          geschweiften Klammern <code>{}</code>. Props sind
+          <strong>read-only</strong> &ndash; die Komponente darf sie nicht
+          ver&auml;ndern.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 3 ==================== -->
+      <section class="card">
+        <h2>3. Bedingte Anzeige &ndash; Inhalte dynamisch anpassen</h2>
+
+        <p>
+          Manchmal soll eine Komponente je nach Situation etwas anderes anzeigen.
+          Das kennst du schon von <code>if/else</code> &ndash; in React geht das
+          genauso! Dazu gibt es zwei Wege:
+        </p>
+
+        <p>
+          <strong>Weg 1: Der Tern&auml;r-Operator</strong>
+          (<code>bedingung ? wennJa : wennNein</code>) &ndash; perfekt f&uuml;r
+          kurze Entscheidungen direkt im JSX:
+        </p>
+
+        <pre><code>function StatusBadge(props) {
+  return (
+    &lt;span className={props.isOnline ? "badge-green" : "badge-gray"}&gt;
+      {props.isOnline ? "Online" : "Offline"}
+    &lt;/span&gt;
+  );
+}
+
+&lt;StatusBadge isOnline={true} /&gt;    // gr&uuml;ner Badge "Online"
+&lt;StatusBadge isOnline={false} /&gt;   // grauer Badge "Offline"</code></pre>
+
+        <p>
+          <strong>Weg 2: if/else mit Variablen</strong> &ndash; besser f&uuml;r
+          l&auml;ngere Entscheidungen:
+        </p>
+
+        <pre><code>function WeatherIcon(props) {
+  let icon;
+  let color;
+
+  if (props.temperature &gt; 25) {
+    icon = "☀️";
+    color = "text-warm";
+  } else if (props.temperature &gt; 10) {
+    icon = "⛅";
+    color = "text-mild";
+  } else {
+    icon = "❄️";
+    color = "text-cold";
+  }
+
+  return (
+    &lt;div className={color}&gt;
+      &lt;span&gt;{icon}&lt;/span&gt;
+      &lt;span&gt;{props.temperature}°C&lt;/span&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <h3>Falsch:</h3>
+        <pre class="wrong"><code>// class ist ein reserviertes Wort in JavaScript!
+&lt;div class="badge-green"&gt;Online&lt;/div&gt;</code></pre>
+
+        <h3>Richtig:</h3>
+        <pre class="right"><code>// In JSX: className statt class
+&lt;div className="badge-green"&gt;Online&lt;/div&gt;</code></pre>
+
+        <div class="hint warning">
+          <strong>Achtung:</strong> <code>class</code> ist ein reserviertes Wort
+          in JavaScript. Deshalb hei&szlig;t es in JSX immer
+          <code>className</code>!
+        </div>
+
+        <div class="hint">
+          <strong>Merke:</strong> Mit dem Tern&auml;r-Operator
+          <code>bedingung ? wennJa : wennNein</code> kannst du direkt im JSX
+          entscheiden, was angezeigt wird. F&uuml;r l&auml;ngere Logik nutze
+          <code>if/else</code> vor dem <code>return</code>.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 4 ==================== -->
+      <section class="card">
+        <h2>4. useState &ndash; Daten merken und &auml;ndern</h2>
+
+        <p>
+          Bisher haben unsere Komponenten nur Daten angezeigt, die von
+          au&szlig;en kamen (Props). Aber was, wenn sich etwas
+          <em>innerhalb</em> der Komponente &auml;ndern soll? Daf&uuml;r gibt es
+          <strong>State</strong> (Zustand).
+        </p>
+
+        <p>
+          Stell dir den Unterschied so vor: <strong>Props</strong> sind wie ein
+          Brief, den du bekommst &ndash; du kannst ihn lesen, aber nicht
+          umschreiben. <strong>State</strong> ist wie eine Tafel in deinem Zimmer
+          &ndash; du kannst jederzeit etwas Neues draufschreiben.
+        </p>
+
+        <p>
+          <code>useState</code> ist ein sogenannter <strong>Hook</strong> &ndash;
+          eine spezielle Funktion von React. Er gibt dir zwei Dinge
+          zur&uuml;ck: den <strong>aktuellen Wert</strong> und eine
+          <strong>Funktion zum &Auml;ndern</strong>.
+        </p>
+
+        <pre><code>function Counter() {
+  const [count, setCount] = React.useState(0);
+  //     ^^^^^  ^^^^^^^^                   ^
+  //     Wert   Funktion zum &Auml;ndern       Startwert
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Z&auml;hler: {count}&lt;/p&gt;
+      &lt;button onClick={function() { setCount(count + 1); }}&gt;
+        Plus 1
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <div class="visual">
+          <div class="flow">
+            <span class="tag state">count <small>0</small></span>
+            <span class="arrow">&rarr;</span>
+            <span class="tag callback"
+              >setCount(1) <small>Klick!</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag state">count <small>1</small></span>
+          </div>
+          <p class="caption">
+            <code>setCount</code> &auml;ndert den Wert. React rendert die
+            Komponente dann automatisch neu.
+          </p>
+        </div>
+
+        <div class="hint">
+          <strong>Merke:</strong> <code>useState</code> gibt dir eine Variable
+          und eine Funktion zum &Auml;ndern. Wenn du die Funktion aufrufst, wird
+          die Komponente <strong>automatisch neu gerendert</strong> &ndash; die
+          Anzeige aktualisiert sich von selbst!
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 5 ==================== -->
+      <section class="card">
+        <h2>5. Callback-Funktionen &ndash; Auf Aktionen reagieren</h2>
+
+        <p>
+          Du kennst schon <code>addEventListener</code> aus JavaScript. In React
+          funktioniert das &auml;hnlich, aber einfacher: Du schreibst
+          <strong>Event-Handler</strong> direkt als Attribute in dein JSX.
+        </p>
+
+        <p>
+          Die wichtigsten Events: <code>onClick</code> (Klick),
+          <code>onChange</code> (&Auml;nderung in Eingabefeldern) und
+          <code>onSubmit</code> (Formular absenden).
+        </p>
+
+        <pre><code>// onClick: Auf Klicks reagieren
+function LikeButton() {
+  const [likes, setLikes] = React.useState(0);
+
+  function handleClick() {
+    setLikes(likes + 1);
+  }
+
+  return (
+    &lt;button onClick={handleClick}&gt;
+      ❤️ {likes} Likes
+    &lt;/button&gt;
+  );
+}</code></pre>
+
+        <pre><code>// onChange: Eingaben verfolgen
+function NameInput() {
+  const [name, setName] = React.useState("");
+
+  function handleChange(event) {
+    setName(event.target.value);
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;input type="text" value={name} onChange={handleChange} /&gt;
+      &lt;p&gt;Hallo, {name}!&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <p>
+          Ein besonders n&uuml;tzliches Muster: Du kannst eine Funktion als
+          <strong>Callback-Prop</strong> an eine Kind-Komponente &uuml;bergeben.
+          So kann das Kind der Eltern-Komponente &bdquo;Bescheid
+          sagen&ldquo;.
+        </p>
+
+        <pre><code>function ColorButton(props) {
+  return (
+    &lt;button onClick={function() { props.onSelect(props.color); }}&gt;
+      {props.color}
+    &lt;/button&gt;
+  );
+}
+
+function ColorPicker() {
+  const [selected, setSelected] = React.useState("Keine");
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Gew&auml;hlte Farbe: {selected}&lt;/p&gt;
+      &lt;ColorButton color="Rot" onSelect={setSelected} /&gt;
+      &lt;ColorButton color="Blau" onSelect={setSelected} /&gt;
+      &lt;ColorButton color="Gr&uuml;n" onSelect={setSelected} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <div class="call-chain">
+          <h4>Callback-Kette:</h4>
+          <div class="chain">
+            <div class="chain-item main-fn">
+              ColorPicker (Eltern) &ndash; State: selected
+              <div class="chain-item sub-fn">
+                ColorButton color="Rot" onSelect={setSelected}
+                <div class="chain-item sub-fn-deep">
+                  Klick! &rarr; props.onSelect("Rot") &rarr;
+                  setSelected("Rot")
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">
+          <strong>Merke:</strong> In JSX schreibst du
+          <code>onClick={funktionsname}</code> &ndash;
+          <strong>ohne Klammern</strong>! Mit Klammern w&uuml;rde die Funktion
+          sofort aufgerufen. Callbacks als Props erm&ouml;glichen die
+          Kommunikation vom Kind zur Eltern-Komponente.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 6 ==================== -->
+      <section class="card">
+        <h2>6. Jetzt bist du dran!</h2>
+
+        <p>
+          Wende dein Wissen &uuml;ber React-Komponenten, Props, State und
+          Callbacks in diesen drei Projekten an. Jede &Uuml;bung baut auf den
+          Konzepten aus den Sektionen 1&ndash;5 auf.
+        </p>
+
+        <div class="exercise-links">
+          <a href="grusskarten-generator.html" class="exercise-link">
+            <span class="exercise-number">1</span>
+            <div>
+              <strong>Der Gru&szlig;karten-Generator</strong>
+              <small
+                >Gef&uuml;hrte Aufgabe &ndash; Komponenten, Props &amp; State
+                kombinieren</small
+              >
+            </div>
+          </a>
+          <a href="emoji-bewertung.html" class="exercise-link">
+            <span class="exercise-number">2</span>
+            <div>
+              <strong>Die Emoji-Bewertung</strong>
+              <small
+                >Bewertungen mit Emojis &ndash; Props, bedingte Anzeige &amp;
+                Callbacks</small
+              >
+            </div>
+          </a>
+          <a href="mini-quiz.html" class="exercise-link">
+            <span class="exercise-number">3</span>
+            <div>
+              <strong>Das Mini-Quiz</strong>
+              <small
+                >Quiz-App mit Score &ndash; mehrere Komponenten &amp;
+                State-Management</small
+              >
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Übung 1: Grußkarten-Generator</title>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      .greeting-card {
+        background: linear-gradient(135deg, #1a2744, #1e293b);
+        border: 2px solid #38bdf8;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        margin: 1rem 0;
+        min-height: 200px;
+        transition:
+          border-color 0.3s,
+          background 0.3s;
+      }
+
+      .greeting-card.happy {
+        border-color: #f59e0b;
+        background: linear-gradient(135deg, #27200d, #1e293b);
+      }
+
+      .greeting-card.love {
+        border-color: #ef4444;
+        background: linear-gradient(135deg, #2d1215, #1e293b);
+      }
+
+      .greeting-card.cool {
+        border-color: #22c55e;
+        background: linear-gradient(135deg, #14291e, #1e293b);
+      }
+
+      .greeting-card h2 {
+        font-size: 1.5rem;
+        color: #e2e8f0;
+        margin-bottom: 0.5rem;
+      }
+
+      .greeting-card .message {
+        font-size: 1.1rem;
+        color: #94a3b8;
+        margin-top: 0.8rem;
+      }
+
+      .greeting-card .emoji {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-group {
+        margin: 0.8rem 0;
+      }
+
+      .form-group label {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #38bdf8;
+      }
+
+      .mood-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin: 0.5rem 0;
+      }
+
+      .mood-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: #334155;
+        color: #e2e8f0;
+        border: 2px solid transparent;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      .mood-btn:hover {
+        background: #475569;
+      }
+
+      .mood-btn.active {
+        border-color: #38bdf8;
+        background: #1a2744;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&Uuml;bung: Der Gru&szlig;karten-Generator</h1>
+      <p class="subtitle">React-Komponenten, Props &amp; State in der Praxis</p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Gef&uuml;hrte Aufgabe: Der Gru&szlig;karten-Generator</h2>
+
+        <p>
+          In dieser &Uuml;bung baust du Schritt f&uuml;r Schritt einen
+          Gru&szlig;karten-Generator. Der Nutzer kann einen Namen eingeben, eine
+          Nachricht schreiben und eine Stimmung w&auml;hlen &ndash; die Karte
+          aktualisiert sich sofort!
+        </p>
+
+        <div class="hint">
+          <strong>Vorbereitung:</strong> &Ouml;ffne das Terminal und erstelle
+          ein neues React-Projekt mit <strong>Create React App</strong>:
+          <pre><code>npx create-react-app grusskarte
+cd grusskarte
+npm start</code></pre>
+          <p>
+            Der Befehl <code>npx create-react-app grusskarte</code> erstellt
+            einen neuen Ordner <code>grusskarte</code> mit allem, was du
+            brauchst. <code>npm start</code> startet einen Entwicklungsserver
+            &ndash; dein Browser &ouml;ffnet sich automatisch auf
+            <code>localhost:3000</code>.
+          </p>
+          <p>
+            Deinen Code schreibst du in die Datei
+            <code>src/App.js</code>. Ersetze den bestehenden Inhalt komplett
+            durch deinen eigenen Code. Die Seite aktualisiert sich bei jeder
+            &Auml;nderung automatisch!
+          </p>
+          <p>
+            &Ouml;ffne zus&auml;tzlich die <strong>Konsole</strong> im Browser
+            (F12 &rarr; Console), um Fehler zu sehen.
+          </p>
+        </div>
+
+        <!-- ===== Schritt 1 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>Die Gru&szlig;karte als Komponente</h3>
+          </div>
+
+          <p>
+            Erstelle eine Komponente <code>GreetingCard</code>, die einen
+            einfachen Gru&szlig; anzeigt. Die Komponente gibt JSX zur&uuml;ck
+            &ndash; das ist der sichtbare Teil.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>// src/App.js
+function GreetingCard() {
+  return (
+    &lt;div&gt;
+      &lt;p style={{fontSize: "3rem"}}&gt;👋&lt;/p&gt;
+      &lt;h2&gt;Hallo!&lt;/h2&gt;
+      &lt;p&gt;Willkommen bei React!&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> <code>className</code> statt
+              <code>class</code>! Die Zeile
+              <code>export default GreetingCard</code> sagt React: &bdquo;Das
+              ist die Komponente, die diese Datei nach au&szlig;en
+              bereitstellt.&ldquo; Create React App zeigt automatisch die
+              exportierte Komponente aus <code>src/App.js</code> an. Teste den
+              Code im Browser &ndash; du solltest den Gru&szlig; sehen.
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 2 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Props f&uuml;r den Namen</h3>
+          </div>
+
+          <p>
+            Erweitere die Komponente um einen <strong>Props-Parameter</strong>,
+            damit der Name personalisiert werden kann. Die Komponente soll den
+            Namen anzeigen, der von au&szlig;en &uuml;bergeben wird.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>// src/App.js
+function GreetingCard(props) {
+  return (
+    &lt;div&gt;
+      &lt;p style={{fontSize: "3rem"}}&gt;👋&lt;/p&gt;
+      &lt;h2&gt;Hallo, {props.name}!&lt;/h2&gt;
+      &lt;p&gt;Sch&ouml;n, dass du da bist!&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// App-Komponente ruft GreetingCard mit einem Prop auf:
+function App() {
+  return &lt;GreetingCard name="Anna" /&gt;;
+}
+
+export default App;</code></pre>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag var">name="Anna" <small>Attribut</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag prop">props.name <small>"Anna"</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag jsx">{props.name} <small>im JSX</small></span>
+              </div>
+              <p class="caption">
+                Der Wert von <code>name</code> flie&szlig;t als
+                <code>props.name</code> in die Komponente.
+              </p>
+            </div>
+
+            <div class="hint">
+              <strong>Tipp:</strong> Der Wert in geschweiften Klammern
+              <code>{props.name}</code> wird durch den tats&auml;chlichen Wert
+              ersetzt. Probiere verschiedene Namen aus!
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 3 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>Mehr Props &ndash; Nachricht und Stimmung</h3>
+          </div>
+
+          <p>
+            F&uuml;ge zwei weitere Props hinzu: <code>message</code> f&uuml;r
+            eine pers&ouml;nliche Nachricht und <code>mood</code> f&uuml;r die
+            Stimmung (z.B. "happy", "love", "cool"). Die Stimmung soll das Emoji
+            und die Farbe der Karte &auml;ndern.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>// src/App.js
+function GreetingCard(props) {
+  let emoji;
+  if (props.mood === "happy") {
+    emoji = "😊";
+  } else if (props.mood === "love") {
+    emoji = "❤️";
+  } else if (props.mood === "cool") {
+    emoji = "😎";
+  } else {
+    emoji = "👋";
+  }
+
+  return (
+    &lt;div className={"greeting-card " + props.mood}&gt;
+      &lt;div className="emoji"&gt;{emoji}&lt;/div&gt;
+      &lt;h2&gt;Hallo, {props.name}!&lt;/h2&gt;
+      &lt;p className="message"&gt;{props.message}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+function App() {
+  return (
+    &lt;GreetingCard
+      name="Max"
+      message="Alles Gute zum Geburtstag!"
+      mood="happy"
+    /&gt;
+  );
+}
+
+export default App;</code></pre>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag var">name="Max" <small>Prop 1</small></span>
+                <span class="tag var">message="..." <small>Prop 2</small></span>
+                <span class="tag var">mood="happy" <small>Prop 3</small></span>
+              </div>
+              <p class="caption">
+                Alle drei Props flie&szlig;en in die Komponente und steuern
+                Name, Nachricht und Aussehen.
+              </p>
+            </div>
+
+            <div class="hint">
+              <strong>Beachte:</strong> Hier siehst du
+              <strong>bedingte Anzeige</strong> in Aktion: Je nach
+              <code>mood</code> wird ein anderes Emoji angezeigt und eine andere
+              CSS-Klasse gesetzt. Die Klasse &auml;ndert die Rahmenfarbe und den
+              Hintergrund der Karte.
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 4 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>useState f&uuml;r das Formular</h3>
+          </div>
+
+          <p>
+            Erstelle eine neue Komponente <code>CardCreator</code>, die ein
+            Formular anzeigt. Verwende <code>useState</code>, damit React sich
+            merkt, was der Nutzer eingibt. Du brauchst drei State-Variablen:
+            <code>name</code>, <code>message</code> und <code>mood</code>.
+          </p>
+
+          <p>
+            Die <code>CardCreator</code>-Komponente soll die
+            <code>GreetingCard</code> verwenden und ihr die State-Werte als
+            Props &uuml;bergeben.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>// src/App.js
+import { useState } from "react";
+
+function CardCreator() {
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const [mood, setMood] = useState("happy");
+
+  function handleNameChange(event) {
+    setName(event.target.value);
+  }
+
+  function handleMessageChange(event) {
+    setMessage(event.target.value);
+  }
+
+  function handleMoodChange(newMood) {
+    setMood(newMood);
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;div className="form-group"&gt;
+        &lt;label&gt;Name:&lt;/label&gt;
+        &lt;input
+          type="text"
+          value={name}
+          onChange={handleNameChange}
+          placeholder="F&uuml;r wen ist die Karte?"
+        /&gt;
+      &lt;/div&gt;
+
+      &lt;div className="form-group"&gt;
+        &lt;label&gt;Nachricht:&lt;/label&gt;
+        &lt;input
+          type="text"
+          value={message}
+          onChange={handleMessageChange}
+          placeholder="Deine pers&ouml;nliche Nachricht..."
+        /&gt;
+      &lt;/div&gt;
+
+      &lt;div className="form-group"&gt;
+        &lt;label&gt;Stimmung:&lt;/label&gt;
+        &lt;div className="mood-buttons"&gt;
+          &lt;button
+            className={"mood-btn" + (mood === "happy" ? " active" : "")}
+            onClick={function() { handleMoodChange("happy"); }}
+          &gt;😊 Fr&ouml;hlich&lt;/button&gt;
+          &lt;button
+            className={"mood-btn" + (mood === "love" ? " active" : "")}
+            onClick={function() { handleMoodChange("love"); }}
+          &gt;❤️ Liebe&lt;/button&gt;
+          &lt;button
+            className={"mood-btn" + (mood === "cool" ? " active" : "")}
+            onClick={function() { handleMoodChange("cool"); }}
+          &gt;😎 Cool&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;GreetingCard name={name} message={message} mood={mood} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <div class="hint">
+              <strong>Neu:</strong> Die Zeile
+              <code>import { useState } from "react"</code> holt die
+              <code>useState</code>-Funktion direkt aus React. In Create React
+              App nutzt du immer <code>import</code> statt
+              <code>React.useState</code>.
+            </div>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag callback"
+                  >onChange <small>Eingabe</small></span
+                >
+                <span class="arrow">&rarr;</span>
+                <span class="tag state"
+                  >setName("Anna") <small>State &auml;ndern</small></span
+                >
+                <span class="arrow">&rarr;</span>
+                <span class="tag prop"
+                  >name="Anna" <small>als Prop</small></span
+                >
+              </div>
+              <p class="caption">
+                Jede Eingabe l&ouml;st <code>onChange</code> aus, der State wird
+                aktualisiert, und die Karte rendert sich neu.
+              </p>
+            </div>
+
+            <div class="hint">
+              <strong>Wichtig:</strong> Hier passieren zwei wichtige Dinge:
+              <code>onChange</code> ist ein <strong>Callback</strong>, der bei
+              jeder Tastatureingabe ausgel&ouml;st wird.
+              <code>setName</code> &auml;ndert den State, und React
+              <strong>rendert automatisch neu</strong> &ndash; die
+              Gru&szlig;karte aktualisiert sich sofort!
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Schritt 5 ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>Alles zusammenf&uuml;gen mit der App-Komponente</h3>
+          </div>
+
+          <p>
+            Erstelle eine <code>App</code>-Komponente, die alles zusammenfasst.
+            Die App rendert den <code>CardCreator</code>, und der
+            <code>CardCreator</code> rendert die <code>GreetingCard</code>. So
+            entsteht ein <strong>Komponenten-Baum</strong>.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>// src/App.js &ndash; der vollst&auml;ndige Code:
+import { useState } from "react";
+
+function GreetingCard(props) {
+  // ... (wie in Schritt 3)
+}
+
+function CardCreator() {
+  // ... (wie in Schritt 4)
+}
+
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Gru&szlig;karten-Generator&lt;/h1&gt;
+      &lt;CardCreator /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+
+            <div class="call-chain">
+              <h4>Komponenten-Baum:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  App
+                  <div class="chain-item sub-fn">
+                    CardCreator (State: name, message, mood)
+                    <div class="chain-item sub-fn-deep">
+                      GreetingCard (Props: name, message, mood)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hint">
+              <strong>Beachte:</strong> Die Daten flie&szlig;en von oben nach
+              unten: <code>CardCreator</code> hat den State und gibt ihn als
+              Props an <code>GreetingCard</code> weiter. Das nennt man
+              <strong>Datenfluss von oben nach unten</strong> (Top-Down Data
+              Flow).
+            </div>
+          </details>
+        </div>
+
+        <!-- ===== Bonus ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Schriftgr&ouml;&szlig;e anpassen</h3>
+          </div>
+
+          <p>
+            F&uuml;ge einen weiteren State <code>fontSize</code> hinzu (z.B.
+            "klein", "mittel", "gro&szlig;") und erstelle drei Buttons, mit
+            denen der Nutzer die Schriftgr&ouml;&szlig;e der Nachricht
+            &auml;ndern kann. &Uuml;bergib <code>fontSize</code> als Prop an die
+            <code>GreetingCard</code>.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+
+            <pre><code>// In CardCreator hinzuf&uuml;gen:
+const [fontSize, setFontSize] = useState("mittel");
+
+function handleFontSizeChange(newSize) {
+  setFontSize(newSize);
+}
+
+// Neue Buttons im Formular:
+&lt;div className="form-group"&gt;
+  &lt;label&gt;Schriftgr&ouml;&szlig;e:&lt;/label&gt;
+  &lt;div className="mood-buttons"&gt;
+    &lt;button
+      className={"mood-btn" + (fontSize === "klein" ? " active" : "")}
+      onClick={function() { handleFontSizeChange("klein"); }}
+    &gt;Klein&lt;/button&gt;
+    &lt;button
+      className={"mood-btn" + (fontSize === "mittel" ? " active" : "")}
+      onClick={function() { handleFontSizeChange("mittel"); }}
+    &gt;Mittel&lt;/button&gt;
+    &lt;button
+      className={"mood-btn" + (fontSize === "gross" ? " active" : "")}
+      onClick={function() { handleFontSizeChange("gross"); }}
+    &gt;Gro&szlig;&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+// In GreetingCard die Prop nutzen:
+let textSize;
+if (props.fontSize === "klein") {
+  textSize = "0.9rem";
+} else if (props.fontSize === "gross") {
+  textSize = "1.4rem";
+} else {
+  textSize = "1.1rem";
+}
+
+&lt;p className="message" style={{fontSize: textSize}}&gt;
+  {props.message}
+&lt;/p&gt;</code></pre>
+          </details>
+        </div>
+
+        <!-- ===== Live-Demo ===== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+
+          <p>
+            So sieht der fertige Gru&szlig;karten-Generator aus. Gib einen Namen
+            ein, w&auml;hle eine Stimmung und schreibe eine Nachricht!
+          </p>
+
+          <div id="react-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script type="text/babel">
+      function GreetingCard(props) {
+        let emoji;
+        if (props.mood === "happy") {
+          emoji = "😊";
+        } else if (props.mood === "love") {
+          emoji = "❤️";
+        } else if (props.mood === "cool") {
+          emoji = "😎";
+        } else {
+          emoji = "👋";
+        }
+
+        return (
+          <div className={"greeting-card " + (props.mood || "")}>
+            <div className="emoji">{emoji}</div>
+            <h2>{props.name ? "Hallo, " + props.name + "!" : "Hallo!"}</h2>
+            <p className="message">
+              {props.message || "Schreibe eine Nachricht..."}
+            </p>
+          </div>
+        );
+      }
+
+      function CardCreator() {
+        const [name, setName] = React.useState("");
+        const [message, setMessage] = React.useState("");
+        const [mood, setMood] = React.useState("happy");
+
+        function handleNameChange(event) {
+          setName(event.target.value);
+        }
+
+        function handleMessageChange(event) {
+          setMessage(event.target.value);
+        }
+
+        function handleMoodChange(newMood) {
+          setMood(newMood);
+        }
+
+        return (
+          <div>
+            <div className="form-group">
+              <label>Name:</label>
+              <input
+                type="text"
+                value={name}
+                onChange={handleNameChange}
+                placeholder="Für wen ist die Karte?"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Nachricht:</label>
+              <input
+                type="text"
+                value={message}
+                onChange={handleMessageChange}
+                placeholder="Deine persönliche Nachricht..."
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Stimmung:</label>
+              <div className="mood-buttons">
+                <button
+                  className={"mood-btn" + (mood === "happy" ? " active" : "")}
+                  onClick={function () {
+                    handleMoodChange("happy");
+                  }}
+                >
+                  😊 Fröhlich
+                </button>
+                <button
+                  className={"mood-btn" + (mood === "love" ? " active" : "")}
+                  onClick={function () {
+                    handleMoodChange("love");
+                  }}
+                >
+                  ❤️ Liebe
+                </button>
+                <button
+                  className={"mood-btn" + (mood === "cool" ? " active" : "")}
+                  onClick={function () {
+                    handleMoodChange("cool");
+                  }}
+                >
+                  😎 Cool
+                </button>
+              </div>
+            </div>
+
+            <GreetingCard name={name} message={message} mood={mood} />
+          </div>
+        );
+      }
+
+      function App() {
+        return (
+          <div>
+            <CardCreator />
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("react-root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
