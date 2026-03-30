@@ -151,283 +151,36 @@ console.log(result); // 10</code></pre>
         </div>
       </section>
 
-      <!-- Sektion 6: Große geführte Aufgabe -->
-      <section class="card exercise">
-        <h2>6. Geführte Aufgabe: Der Witz-Generator</h2>
+      <!-- Übungen -->
+      <section class="card">
+        <h2>6. Jetzt bist du dran!</h2>
         <p>
-          Jetzt wird es ernst! Folge den Schritten und baue Schritt für Schritt
-          einen <strong>Witz-Generator</strong> in VSCode. Erstelle dafür eine
-          neue Datei <code>jokes.js</code> und binde sie in eine HTML-Datei ein.
+          Wende dein Wissen über Parameter und Variablen in diesen drei
+          Projekten an. Jede Übung baut auf den Konzepten aus den
+          Sektionen 1&ndash;5 auf.
         </p>
-
-        <div class="hint">
-          <strong>Vorbereitung:</strong> Erstelle eine
-          <code>uebung.html</code> mit diesem Grundgerüst:<br /><br />
-          <code>&lt;script src="jokes.js"&gt;&lt;/script&gt;</code><br /><br />
-          Öffne die Datei im Browser und öffne die <strong>Konsole</strong> (F12
-          &rarr; Console).
-        </div>
-
-        <!-- Schritt 1 -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number">1</span>
-            <h3>Das Witze-Array (globale Variable)</h3>
-          </div>
-          <p>
-            Erstelle ein Array mit mindestens 6 Witzen. Dieses Array ist eine
-            <strong>globale Variable</strong> &ndash; es lebt außerhalb aller
-            Funktionen und ist überall verfügbar.
-          </p>
-          <details class="solution">
-            <summary>Lösung anzeigen</summary>
-            <pre><code>const jokes = [
-  "Warum können Geister nicht lügen? Man kann durch sie hindurchsehen.",
-  "Ich wollte einen Witz über Pizza machen... aber der ist zu cheesy.",
-  "Warum trinken Programmierer Tee? Weil Java schon vergeben ist.",
-  "Was macht ein Pirat am Computer? Er drückt die Enter-Taste.",
-  "Treffen sich zwei Wände. Sagt die eine: Wir sehen uns an der Ecke!",
-  "Warum hat der Mathematiker Angst vor negativen Zahlen? Er kann einfach nicht ohne sie leben."
-];</code></pre>
-            <div class="hint">
-              <strong>Beachte:</strong> <code>const</code> statt
-              <code>let</code> &ndash; das Array soll nicht neu zugewiesen
-              werden. Die Inhalte können trotzdem geändert werden.
+        <div class="exercise-links">
+          <a href="witz-generator.html" class="exercise-link">
+            <span class="exercise-number">1</span>
+            <div>
+              <strong>Der Witz-Generator</strong>
+              <small>Geführte Aufgabe &ndash; Funktionen, Parameter &amp; Rückgabewerte kombinieren</small>
             </div>
-          </details>
-        </div>
-
-        <!-- Schritt 2 -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number">2</span>
-            <h3>Zufälligen Index berechnen</h3>
-          </div>
-          <p>
-            Schreibe eine Funktion <code>getRandomIndex</code>, die eine
-            <strong>Anzahl</strong> als Parameter bekommt und einen zufälligen
-            Index zwischen 0 und (Anzahl - 1) zurückgibt.
-          </p>
-          <details class="solution">
-            <summary>Lösung anzeigen</summary>
-            <pre><code>function getRandomIndex(count) {
-  let index = Math.floor(Math.random() * count);
-  return index;
-}</code></pre>
-            <div class="visual">
-              <div class="flow">
-                <span class="tag var">jokes.length <small>6</small></span>
-                <span class="arrow">&rarr;</span>
-                <span class="tag param">count <small>6</small></span>
-                <span class="arrow">&rarr;</span>
-                <span class="tag return-tag">return <small>z.B. 3</small></span>
-              </div>
-              <p class="caption">
-                Die Variable <code>jokes.length</code> wird zum Parameter
-                <code>count</code>. Anderer Name, gleicher Wert!
-              </p>
+          </a>
+          <a href="rezept-rechner.html" class="exercise-link">
+            <span class="exercise-number">2</span>
+            <div>
+              <strong>Der Rezept-Rechner</strong>
+              <small>Zutaten umrechnen mit Funktionen &amp; Parametern</small>
             </div>
-          </details>
-        </div>
-
-        <!-- Schritt 3 -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number">3</span>
-            <h3>Witz aus dem Array holen</h3>
-          </div>
-          <p>
-            Schreibe eine Funktion <code>getJoke</code>, die das Witze-Array als
-            Parameter bekommt. Sie soll <code>getRandomIndex()</code>
-            <strong>aufrufen</strong> und den Witz an der zufälligen Stelle
-            zurückgeben.
-          </p>
-          <details class="solution">
-            <summary>Lösung anzeigen</summary>
-            <pre><code>function getJoke(jokeList) {
-  let index = getRandomIndex(jokeList.length);
-  let selectedJoke = jokeList[index];
-  return selectedJoke;
-}</code></pre>
-            <div class="hint">
-              <strong>Wichtig:</strong> Hier ruft eine Funktion eine
-              <em>andere Funktion</em> auf! Der
-              <strong>Rückgabewert</strong> von
-              <code>getRandomIndex()</code> wird in der lokalen Variable
-              <code>index</code> gespeichert. Beachte auch: der Parameter heißt
-              <code>jokeList</code>, nicht <code>jokes</code>!
+          </a>
+          <a href="passwort-generator.html" class="exercise-link">
+            <span class="exercise-number">3</span>
+            <div>
+              <strong>Der Passwort-Generator</strong>
+              <small>Sichere Passwörter generieren mit Strings &amp; Zufallswerten</small>
             </div>
-          </details>
-        </div>
-
-        <!-- Schritt 4 -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number">4</span>
-            <h3>Witz bewerten</h3>
-          </div>
-          <p>
-            Schreibe eine Funktion <code>rateJoke</code>, die einen
-            <strong>einzelnen Witz-Text</strong> als Parameter bekommt und je
-            nach Länge eine Bewertung zurückgibt. Wenn der Witz kürzer als 40
-            Zeichen lang ist soll "Kurz und knackig!" zurückgegeben werden. Wenn
-            der Witz kürzer als 75 Zeichen lang ist soll "Perfekte Länge!"
-            zurückgegeben werden. Ansonsten soll "Puh, das war ein langer Witz!"
-            zurückgegeben werden
-          </p>
-          <details class="solution">
-            <summary>Lösung anzeigen</summary>
-            <pre><code>function rateJoke(jokeText) {
-  let jokeLength = jokeText.length;
-
-  if (jokeLength &lt; 40) {
-    return "Kurz und knackig!";
-  } else if (jokeLength &lt; 75) {
-    return "Perfekte Länge!";
-  } else {
-    return "Puh, das war ein langer Witz!";
-  }
-}</code></pre>
-            <div class="hint">
-              <strong>Beachte:</strong> Der Parameter heißt
-              <code>jokeText</code> &ndash; nicht <code>joke</code> oder
-              <code>jokes</code>. Der Name beschreibt, <em>was</em> die Funktion
-              erwartet: einen einzelnen Text, kein ganzes Array.
-            </div>
-          </details>
-        </div>
-
-        <!-- Schritt 5 -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number">5</span>
-            <h3>Alles zusammenführen</h3>
-          </div>
-          <p>
-            Schreibe die Hauptfunktion <code>showJoke</code>, die alles
-            verbindet: Witz holen, bewerten und in der Konsole ausgeben. Sie
-            nutzt die <strong>Rückgabewerte</strong> der anderen Funktionen!
-          </p>
-          <details class="solution">
-            <summary>Lösung anzeigen</summary>
-            <pre><code>function showJoke(jokeList) {
-  let joke = getJoke(jokeList);
-  let rating = rateJoke(joke);
-
-  console.log("=== Witz des Tages ===");
-  console.log(joke);
-  console.log("Bewertung: " + rating);
-  console.log("Zeichenanzahl: " + joke.length);
-
-  return joke;
-}</code></pre>
-            <div class="call-chain">
-              <h4>Funktionsaufruf-Kette:</h4>
-              <div class="chain">
-                <div class="chain-item main-fn">
-                  showJoke(jokes)
-                  <div class="chain-item sub-fn">
-                    getJoke(jokeList)
-                    <div class="chain-item sub-fn-deep">
-                      getRandomIndex(jokeList.length)
-                    </div>
-                  </div>
-                  <div class="chain-item sub-fn">rateJoke(joke)</div>
-                </div>
-              </div>
-            </div>
-          </details>
-        </div>
-
-        <!-- Schritt 6 -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number">6</span>
-            <h3>Aufrufen und testen!</h3>
-          </div>
-          <p>
-            Rufe die Funktion am Ende deiner Datei auf. Speichere den
-            Rückgabewert in einer Variable &ndash; so kannst du den Witz
-            weiterverwenden. Gib den Witz auf der Konsole aus.
-          </p>
-          <details class="solution">
-            <summary>Lösung anzeigen</summary>
-            <pre><code>// Einmal aufrufen
-let myJoke = showJoke(jokes);
-
-// Den Rückgabewert weiterverwenden
-console.log("Gespeicherter Witz: " + myJoke);</code></pre>
-            <div class="hint">
-              <strong>Tipp:</strong> Lade die Seite mehrmals neu (F5) &ndash;
-              jedes Mal kommt ein anderer Witz!
-            </div>
-          </details>
-        </div>
-
-        <!-- Schritt 7: Bonusaufgabe -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number bonus-icon">*</span>
-            <h3>Bonus: Witz-Vergleich</h3>
-          </div>
-          <p>
-            Schreibe eine Funktion <code>compareJokes</code>, die
-            <strong>zwei Witze</strong> holt, beide bewertet und den kürzeren
-            als "Gewinner" ausgibt.
-          </p>
-          <details class="solution">
-            <summary>Lösung anzeigen</summary>
-            <pre><code>function compareJokes(jokeList) {
-  let joke1 = getJoke(jokeList);
-  let joke2 = getJoke(jokeList);
-
-  let rating1 = rateJoke(joke1);
-  let rating2 = rateJoke(joke2);
-
-  console.log("--- Witz-Duell ---");
-  console.log("Witz 1: " + joke1);
-  console.log("  → " + rating1);
-  console.log("Witz 2: " + joke2);
-  console.log("  → " + rating2);
-
-  if (joke1.length &lt; joke2.length) {
-    console.log("Gewinner: Witz 1 (kürzer!)");
-    return joke1;
-  } else {
-    console.log("Gewinner: Witz 2 (kürzer!)");
-    return joke2;
-  }
-}
-
-compareJokes(jokes);</code></pre>
-          </details>
-        </div>
-
-        <!-- Live-Demo -->
-        <div class="step">
-          <div class="step-header">
-            <span class="step-number demo-icon">&#9654;</span>
-            <h3>Live-Demo: So sieht es aus</h3>
-          </div>
-          <p>
-            Klicke auf die Buttons, um die fertigen Funktionen in Aktion zu
-            sehen.
-          </p>
-          <div class="demo-buttons">
-            <button id="run-joke">Zufälligen Witz zeigen</button>
-            <button id="run-compare">Witz-Duell starten</button>
-          </div>
-          <div id="joke-output" class="output"></div>
-
-          <div id="joke-visual" class="witz-display hidden">
-            <div class="witz-bubble">
-              <span id="joke-text-display"></span>
-            </div>
-            <div class="witz-meta">
-              <span id="joke-rating" class="badge"></span>
-              <span id="joke-length" class="badge badge-gray"></span>
-            </div>
-          </div>
+          </a>
         </div>
       </section>
     </main>
@@ -436,6 +189,5 @@ compareJokes(jokes);</code></pre>
       <p>Frontend Masterclass &ndash; Devkarriere</p>
     </footer>
 
-    <script src="script.js"></script>
   </body>
 </html>

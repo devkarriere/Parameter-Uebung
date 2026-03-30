@@ -488,6 +488,59 @@ details.solution > .call-chain {
   color: #94a3b8;
 }
 
+/* Exercise links */
+.exercise-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.exercise-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  text-decoration: none;
+  color: #e2e8f0;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.exercise-link:hover {
+  border-color: #f59e0b;
+  background: #1a2744;
+}
+
+.exercise-link strong {
+  display: block;
+  font-size: 1.05rem;
+  color: #38bdf8;
+}
+
+.exercise-link small {
+  display: block;
+  margin-top: 0.2rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.exercise-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
 /* Footer */
 footer {
   text-align: center;
