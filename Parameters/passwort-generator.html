@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projekt: Passwort-Generator</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .password-display {
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 12px;
+        padding: 1.2rem 1.5rem;
+        text-align: center;
+        margin: 1rem 0;
+        font-family: "Fira Code", monospace;
+        font-size: 1.4rem;
+        letter-spacing: 0.15em;
+        color: #a3e635;
+        word-break: break-all;
+        min-height: 3.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.3s;
+      }
+      .password-display.strong {
+        border-color: #22c55e;
+      }
+      .password-display.medium {
+        border-color: #f59e0b;
+      }
+      .password-display.weak {
+        border-color: #ef4444;
+      }
+      .strength-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #334155;
+        overflow: hidden;
+        margin: 0.5rem 0;
+      }
+      .strength-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition:
+          width 0.4s,
+          background 0.4s;
+        width: 0%;
+      }
+      .strength-fill.weak {
+        width: 33%;
+        background: #ef4444;
+      }
+      .strength-fill.medium {
+        width: 66%;
+        background: #f59e0b;
+      }
+      .strength-fill.strong {
+        width: 100%;
+        background: #22c55e;
+      }
+      .strength-label {
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0.3rem;
+      }
+      .strength-label.weak {
+        color: #ef4444;
+      }
+      .strength-label.medium {
+        color: #f59e0b;
+      }
+      .strength-label.strong {
+        color: #22c55e;
+      }
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin: 1rem 0;
+      }
+      .control-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .control-row label {
+        color: #94a3b8;
+        font-size: 0.95rem;
+      }
+      .control-row input[type="number"] {
+        width: 70px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 0.5rem 0.6rem;
+        font-size: 1rem;
+        text-align: center;
+        font-family: "Fira Code", monospace;
+      }
+      .control-row input[type="number"]:focus {
+        outline: none;
+        border-color: #38bdf8;
+      }
+      .demo-buttons {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+      .stats {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-top: 0.8rem;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Projekt: Passwort-Generator</h1>
+      <p class="subtitle">
+        Sichere Passwörter bauen mit Funktionen & Parametern
+      </p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Der Passwort-Generator</h2>
+        <p>
+          Baue einen Generator, der zufällige Passwörter erstellt und ihre
+          Stärke bewertet. Du kombinierst mehrere Funktionen, die sich
+          gegenseitig aufrufen und <strong>Parameter</strong> sowie
+          <strong>Rückgabewerte</strong> nutzen.
+        </p>
+        <p>
+          Erstelle eine neue Datei <code>passwort.js</code> und binde sie in
+          eine HTML-Datei ein.
+        </p>
+
+        <!-- Schritt 1 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>Zeichenvorräte als globale Variablen</h3>
+          </div>
+          <p>
+            Erstelle vier String-Variablen, die jeweils einen Vorrat an Zeichen
+            enthalten: Kleinbuchstaben, Großbuchstaben, Ziffern und
+            Sonderzeichen.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>const lowercase = "abcdefghijklmnopqrstuvwxyz";
+const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const digits = "0123456789";
+const symbols = "!@#$%&*?+-_";</code></pre>
+            <div class="hint">
+              <strong>Beachte:</strong> Strings kann man wie Arrays mit
+              <code>[index]</code> ansprechen: <code>"abc"[1]</code> ergibt
+              <code>"b"</code>.
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 2 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Zufälliges Zeichen aus einem String holen</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>getRandomChar</code>, die einen
+            <strong>Zeichen-String</strong> als Parameter bekommt und ein
+            zufälliges Zeichen daraus zurückgibt. Denke an die Funktione
+            Math.floor und Math.random
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function getRandomChar(charSet) {
+  let index = Math.floor(Math.random() * charSet.length);
+  let char = charSet[index];
+  return char;
+}</code></pre>
+            <div class="visual">
+              <div class="flow">
+                <span class="tag var">lowercase <small>"abcde..."</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag param">charSet <small>"abcde..."</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag return-tag">return <small>"m"</small></span>
+              </div>
+              <p class="caption">
+                Der globale String wird als Parameter übergeben. Die Funktion
+                kennt nur <code>charSet</code>, nicht den Originalnamen.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 3 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>Zeichenvorrat zusammenbauen</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>buildCharPool</code>, die vier
+            <strong>Boolean-Parameter</strong> bekommt: <code>useLower</code>,
+            <code>useUpper</code>, <code>useDigits</code> und
+            <code>useSymbols</code>. Jeder Parameter bestimmt, ob die
+            entsprechende Zeichengruppe im Passwort verwendet werden soll. Die
+            Funktion soll einen String zurückgeben, der nur die Zeichen der
+            aktivierten Gruppen enthält. Nutze dazu die Variablen aus Schritt 1
+            und füge sie mit <code>+</code> zusammen.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function buildCharPool(useLower, useUpper, useDigits, useSymbols) {
+  let pool = "";
+
+  if (useLower) {
+    pool = pool + lowercase;
+  }
+  if (useUpper) {
+    pool = pool + uppercase;
+  }
+  if (useDigits) {
+    pool = pool + digits;
+  }
+  if (useSymbols) {
+    pool = pool + symbols;
+  }
+
+  return pool;
+}</code></pre>
+            <div class="hint">
+              <strong>Beachte:</strong> Die Funktion hat
+              <strong>4 Parameter</strong>! Jeder steuert, ob eine Zeichengruppe
+              enthalten sein soll. Mit <code>+</code> werden Strings
+              zusammengefügt.
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 4 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>Passwort generieren</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>generatePassword</code>, die die
+            gewünschte <strong>Länge</strong> und den
+            <strong>Zeichenvorrat</strong> als Parameter bekommt. Dieser
+            Zeichenvorrat ist die Rückgabe aus der Funktion von Aufgabe 3. Die
+            neue Funktion soll <code>getRandomChar</code> in einer Schleife
+            aufrufen und das fertige Passwort als String zurückgeben.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function generatePassword(length, charPool) {
+  let password = "";
+
+  for (let i = 0; i &lt; length; i++) {
+    let char = getRandomChar(charPool);
+    password = password + char;
+  }
+
+  return password;
+}</code></pre>
+            <div class="call-chain">
+              <h4>Funktionsaufruf-Kette:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  generatePassword(12, pool)
+                  <div class="chain-item sub-fn">
+                    getRandomChar(charPool) &rarr; "k"
+                  </div>
+                  <div class="chain-item sub-fn">
+                    getRandomChar(charPool) &rarr; "A"
+                  </div>
+                  <div class="chain-item sub-fn">
+                    getRandomChar(charPool) &rarr; "7"
+                  </div>
+                  <div class="chain-item sub-fn">... (für jedes Zeichen)</div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 5 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>Passwortstärke bewerten</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>ratePassword</code>, die ein
+            <strong>Passwort</strong> und die <strong>Pool-Größe</strong>
+            (Anzahl verschiedener möglicher Zeichen) als Parameter bekommt.
+            Bewerte die Stärke nach der Formel:
+            <code>Länge &times; Pool-Größe</code>. Unter 200 ist "Schwach",
+            unter 500 "Mittel", darüber "Stark". Die Rückgabe soll sowohl den
+            berechneten Score als auch die Bezeichnung "Schwach", "Mittel" und
+            "Stark" zurückgeben (Hinweis: Objekt mit zwei Attributen).
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function ratePassword(password, poolSize) {
+  let score = password.length * poolSize;
+
+  if (score &lt; 200) {
+    return { label: "Schwach", score: score };
+  } else if (score &lt; 500) {
+    return { label: "Mittel", score: score };
+  } else {
+    return { label: "Stark", score: score };
+  }
+}</code></pre>
+            <div class="hint">
+              <strong>Beachte:</strong> Hier wird ein
+              <strong>Objekt</strong> zurückgegeben &ndash; mit zwei Werten
+              gleichzeitig. So kann der Aufrufer sowohl das Label als auch den
+              Score verwenden.
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 6 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">6</span>
+            <h3>Alles zusammenführen und testen</h3>
+          </div>
+          <p>
+            Schreibe eine Hauptfunktion <code>createPassword</code>, die alle
+            vorherigen Funktionen verbindet: Pool zusammenbauen, Passwort
+            generieren, Stärke bewerten und alles in der Konsole ausgeben.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function createPassword(length, useLower, useUpper, useDigits, useSymbols) {
+  let pool = buildCharPool(useLower, useUpper, useDigits, useSymbols);
+
+  if (pool.length === 0) {
+    console.log("Fehler: Mindestens eine Zeichengruppe auswählen!");
+    return null;
+  }
+
+  let password = generatePassword(length, pool);
+  let strength = ratePassword(password, pool.length);
+
+  console.log("=== Neues Passwort ===");
+  console.log("Passwort:  " + password);
+  console.log("Länge:     " + password.length);
+  console.log("Pool:      " + pool.length + " Zeichen");
+  console.log("Score:     " + strength.score);
+  console.log("Stärke:    " + strength.label);
+
+  return { password: password, strength: strength, poolSize: pool.length };
+}
+
+// Testen!
+createPassword(12, true, true, true, true);
+createPassword(8, true, false, true, false);
+createPassword(20, true, true, true, true);</code></pre>
+            <div class="call-chain">
+              <h4>Funktionsaufruf-Kette:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  createPassword(12, true, true, true, true)
+                  <div class="chain-item sub-fn">
+                    buildCharPool(true, true, true, true) &rarr;
+                    "abcABC012!@#..."
+                  </div>
+                  <div class="chain-item sub-fn">
+                    generatePassword(12, pool)
+                    <div class="chain-item sub-fn-deep">
+                      getRandomChar(pool) &times; 12
+                    </div>
+                  </div>
+                  <div class="chain-item sub-fn">
+                    ratePassword(password, 72) &rarr; { label, score }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Bonus -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Mehrere Passwörter vergleichen</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>findStrongest</code>, die eine
+            <strong>Anzahl</strong> als Parameter bekommt, so viele Passwörter
+            generiert und das stärkste zurückgibt.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function findStrongest(count) {
+  let bestPassword = null;
+  let bestScore = 0;
+
+  for (let i = 0; i &lt; count; i++) {
+    let result = createPassword(12, true, true, true, true);
+    if (result.strength.score > bestScore) {
+      bestScore = result.strength.score;
+      bestPassword = result.password;
+    }
+  }
+
+  console.log("--- Bestes von " + count + " Passwörtern ---");
+  console.log(bestPassword);
+  return bestPassword;
+}
+
+findStrongest(5);</code></pre>
+          </details>
+        </div>
+
+        <!-- Live-Demo -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+          <p>Stelle die Länge ein und klicke auf "Generieren".</p>
+          <div class="controls">
+            <div class="control-row">
+              <label for="pw-length">Länge:</label>
+              <input type="number" id="pw-length" value="12" min="4" max="40" />
+            </div>
+          </div>
+          <div class="demo-buttons">
+            <button id="btn-generate">Passwort generieren</button>
+            <button id="btn-strong">Nur stark (alle Zeichen)</button>
+          </div>
+
+          <div class="password-display" id="pw-display">...</div>
+          <div class="strength-bar">
+            <div class="strength-fill" id="strength-fill"></div>
+          </div>
+          <div class="strength-label" id="strength-label"></div>
+          <div class="stats" id="pw-stats"></div>
+          <div id="pw-output" class="output"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script>
+      // === Globale Zeichenvorräte ===
+      const lowercase = "abcdefghijklmnopqrstuvwxyz";
+      const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const digits = "0123456789";
+      const symbols = "!@#$%&*?+-_";
+
+      // === Funktionen ===
+      function getRandomChar(charSet) {
+        let index = Math.floor(Math.random() * charSet.length);
+        return charSet[index];
+      }
+
+      function buildCharPool(useLower, useUpper, useDigits, useSymbols) {
+        let pool = "";
+        if (useLower) {
+          pool = pool + lowercase;
+        }
+        if (useUpper) {
+          pool = pool + uppercase;
+        }
+        if (useDigits) {
+          pool = pool + digits;
+        }
+        if (useSymbols) {
+          pool = pool + symbols;
+        }
+        return pool;
+      }
+
+      function generatePassword(length, charPool) {
+        let password = "";
+        for (let i = 0; i < length; i++) {
+          let char = getRandomChar(charPool);
+          password = password + char;
+        }
+        return password;
+      }
+
+      function ratePassword(password, poolSize) {
+        let score = password.length * poolSize;
+        if (score < 200) {
+          return { label: "Schwach", score: score };
+        } else if (score < 500) {
+          return { label: "Mittel", score: score };
+        } else {
+          return { label: "Stark", score: score };
+        }
+      }
+
+      function createPassword(
+        length,
+        useLower,
+        useUpper,
+        useDigits,
+        useSymbols,
+      ) {
+        let pool = buildCharPool(useLower, useUpper, useDigits, useSymbols);
+        if (pool.length === 0) {
+          return null;
+        }
+        let password = generatePassword(length, pool);
+        let strength = ratePassword(password, pool.length);
+        return {
+          password: password,
+          strength: strength,
+          poolSize: pool.length,
+        };
+      }
+
+      // === UI aktualisieren ===
+      function showResult(result) {
+        if (!result) {
+          return;
+        }
+
+        let display = document.getElementById("pw-display");
+        let fill = document.getElementById("strength-fill");
+        let label = document.getElementById("strength-label");
+        let stats = document.getElementById("pw-stats");
+        let output = document.getElementById("pw-output");
+
+        display.textContent = result.password;
+        display.className = "password-display";
+
+        fill.className = "strength-fill";
+        label.className = "strength-label";
+
+        if (result.strength.label === "Schwach") {
+          display.classList.add("weak");
+          fill.classList.add("weak");
+          label.classList.add("weak");
+        } else if (result.strength.label === "Mittel") {
+          display.classList.add("medium");
+          fill.classList.add("medium");
+          label.classList.add("medium");
+        } else {
+          display.classList.add("strong");
+          fill.classList.add("strong");
+          label.classList.add("strong");
+        }
+
+        label.textContent =
+          result.strength.label + " (Score: " + result.strength.score + ")";
+
+        stats.innerHTML =
+          '<span class="badge badge-gray">' +
+          result.password.length +
+          " Zeichen</span>" +
+          '<span class="badge badge-gray">Pool: ' +
+          result.poolSize +
+          "</span>";
+
+        output.textContent = "=== Neues Passwort ===\n";
+        output.textContent += "Passwort:  " + result.password + "\n";
+        output.textContent += "Länge:     " + result.password.length + "\n";
+        output.textContent += "Pool:      " + result.poolSize + " Zeichen\n";
+        output.textContent += "Score:     " + result.strength.score + "\n";
+        output.textContent += "Stärke:    " + result.strength.label + "\n";
+      }
+
+      // === Button-Events ===
+      document
+        .getElementById("btn-generate")
+        .addEventListener("click", function () {
+          let length = parseInt(document.getElementById("pw-length").value);
+          if (isNaN(length) || length < 4) {
+            length = 4;
+          }
+          let result = createPassword(length, true, false, true, false);
+          showResult(result);
+        });
+
+      document
+        .getElementById("btn-strong")
+        .addEventListener("click", function () {
+          let length = parseInt(document.getElementById("pw-length").value);
+          if (isNaN(length) || length < 4) {
+            length = 4;
+          }
+          let result = createPassword(length, true, true, true, true);
+          showResult(result);
+        });
+    </script>
+  </body>
+</html>

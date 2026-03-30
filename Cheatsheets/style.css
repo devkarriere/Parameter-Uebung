@@ -1,0 +1,458 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  line-height: 1.6;
+  padding: 2rem 1rem;
+}
+
+/* ===========================
+   Header & Navigation
+   =========================== */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  font-size: 2rem;
+  color: #38bdf8;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  margin-top: 0.3rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.tab {
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  padding: 0.6rem 1.8rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.tab.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.print-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-print {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-print:hover {
+  background: #15803d;
+}
+
+.btn-print.secondary {
+  background: #334155;
+}
+
+.btn-print.secondary:hover {
+  background: #475569;
+}
+
+/* ===========================
+   Cheatsheet Containers
+   =========================== */
+.cheatsheet {
+  display: none;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cheatsheet.active {
+  display: block;
+}
+
+.sheet-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.sheet-header h2 {
+  font-size: 1.6rem;
+  color: #38bdf8;
+}
+
+.sheet-subtitle {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+}
+
+/* ===========================
+   Card Grid
+   =========================== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid #334155;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.card h3 {
+  color: #38bdf8;
+  font-size: 1.05rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #334155;
+}
+
+/* ===========================
+   Code Blocks
+   =========================== */
+pre {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 0.7rem 0.9rem;
+  overflow-x: auto;
+  margin: 0.4rem 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+code {
+  font-family: "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+  color: #e2e8f0;
+}
+
+p code,
+td code,
+.hint code {
+  background: #334155;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.85em;
+  color: #7dd3fc;
+}
+
+/* ===========================
+   Reference Tables
+   =========================== */
+.ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 0.4rem 0;
+}
+
+.ref-table tr {
+  border-bottom: 1px solid #1e293b;
+}
+
+.ref-table td {
+  padding: 0.35rem 0.5rem;
+  vertical-align: top;
+}
+
+.ref-table td:first-child {
+  white-space: nowrap;
+  width: 40%;
+}
+
+/* ===========================
+   Hints
+   =========================== */
+.hint {
+  background: #1a2744;
+  border-left: 3px solid #38bdf8;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0 6px 6px 0;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+}
+
+/* ===========================
+   Box Model Visual (CSS Sheet)
+   =========================== */
+.box-model-visual {
+  margin: 0.5rem 0;
+  text-align: center;
+  font-size: 0.7rem;
+  font-family: monospace;
+}
+
+.bm-margin {
+  background: #451a03;
+  color: #fdba74;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px dashed #f59e0b;
+}
+
+.bm-border {
+  background: #1a2744;
+  color: #7dd3fc;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.3rem;
+  border: 1px solid #38bdf8;
+}
+
+.bm-padding {
+  background: #14532d;
+  color: #86efac;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.3rem;
+  border: 1px dashed #22c55e;
+}
+
+.bm-content {
+  background: #334155;
+  color: #e2e8f0;
+  padding: 0.6rem;
+  border-radius: 3px;
+  margin-top: 0.3rem;
+  font-weight: bold;
+}
+
+/* ===========================
+   Sheet Footer
+   =========================== */
+.sheet-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #334155;
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+/* ===========================
+   Responsive
+   =========================== */
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .print-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* ===========================
+   Print / PDF Styles
+   =========================== */
+@page {
+  size: A4 landscape;
+  margin: 12mm 14mm;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  body {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    padding: 0;
+    margin: 0;
+    font-size: 8.5pt;
+    line-height: 1.35;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .cheatsheet {
+    display: none !important;
+    max-width: 100%;
+    page-break-after: always;
+  }
+
+  .cheatsheet:last-child {
+    page-break-after: avoid;
+  }
+
+  .cheatsheet.print-active {
+    display: block !important;
+  }
+
+  .sheet-header {
+    margin-bottom: 8px;
+  }
+
+  .sheet-header h2 {
+    color: #38bdf8 !important;
+    font-size: 16pt;
+    margin-bottom: 2px;
+  }
+
+  .sheet-subtitle {
+    color: #94a3b8 !important;
+    font-size: 8pt;
+  }
+
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+
+  .card {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    padding: 7px 9px;
+    border-radius: 6px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card h3 {
+    color: #38bdf8 !important;
+    font-size: 8.5pt;
+    margin-bottom: 3px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #334155 !important;
+  }
+
+  pre {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    padding: 4px 6px;
+    font-size: 6.5pt;
+    line-height: 1.25;
+    margin: 3px 0;
+    border-radius: 4px;
+  }
+
+  code {
+    color: #e2e8f0 !important;
+  }
+
+  p code,
+  td code,
+  .hint code {
+    background: #334155 !important;
+    color: #7dd3fc !important;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+
+  .ref-table {
+    font-size: 7pt;
+  }
+
+  .ref-table tr {
+    border-bottom-color: #334155 !important;
+  }
+
+  .ref-table td {
+    padding: 1.5px 4px;
+    color: #e2e8f0 !important;
+  }
+
+  .hint {
+    background: #1a2744 !important;
+    border-left: 3px solid #38bdf8 !important;
+    color: #e2e8f0 !important;
+    padding: 3px 6px;
+    font-size: 7pt;
+    margin-top: 3px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .box-model-visual {
+    font-size: 6pt;
+  }
+
+  .bm-margin {
+    background: #451a03 !important;
+    color: #fdba74 !important;
+    border-color: #f59e0b !important;
+    padding: 3px;
+  }
+
+  .bm-border {
+    background: #1a2744 !important;
+    color: #7dd3fc !important;
+    border-color: #38bdf8 !important;
+    padding: 3px;
+    margin-top: 2px;
+  }
+
+  .bm-padding {
+    background: #14532d !important;
+    color: #86efac !important;
+    border-color: #22c55e !important;
+    padding: 3px;
+    margin-top: 2px;
+  }
+
+  .bm-content {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+    padding: 4px;
+    margin-top: 2px;
+  }
+
+  .sheet-footer {
+    color: #475569 !important;
+    border-top: 1px solid #334155 !important;
+    font-size: 7pt;
+    margin-top: 8px;
+    padding-top: 4px;
+  }
+}

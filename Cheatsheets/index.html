@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web-Entwicklung Cheatsheets &ndash; HTML, CSS &amp; JavaScript</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="no-print">
+      <h1>Web-Entwicklung Cheatsheets</h1>
+      <p class="subtitle">HTML, CSS &amp; JavaScript &ndash; Das Wichtigste auf einen Blick</p>
+      <nav class="tabs">
+        <button class="tab active" data-target="html">HTML</button>
+        <button class="tab" data-target="css">CSS</button>
+        <button class="tab" data-target="js">JavaScript</button>
+      </nav>
+      <div class="print-controls">
+        <button id="print-current" class="btn-print">Aktuelle Seite als PDF speichern</button>
+        <button id="print-all" class="btn-print secondary">Alle Cheatsheets als PDF</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ================================ -->
+      <!-- HTML CHEATSHEET                  -->
+      <!-- ================================ -->
+      <div class="cheatsheet active" id="html">
+        <div class="sheet-header">
+          <h2>HTML Cheatsheet</h2>
+          <p class="sheet-subtitle">HyperText Markup Language &ndash; Die Struktur jeder Webseite</p>
+        </div>
+
+        <div class="grid">
+          <!-- Grundgerüst -->
+          <section class="card">
+            <h3>Grundgerüst</h3>
+            <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="de"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0" /&gt;
+    &lt;title&gt;Meine Seite&lt;/title&gt;
+    &lt;link rel="stylesheet"
+      href="style.css" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- Inhalt hier --&gt;
+    &lt;script src="script.js"&gt;
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            <div class="hint">Jede HTML-Datei beginnt mit diesem Grundgerüst.</div>
+          </section>
+
+          <!-- Text-Elemente -->
+          <section class="card">
+            <h3>Text-Elemente</h3>
+            <table class="ref-table">
+              <tr><td><code>&lt;h1&gt;</code> bis <code>&lt;h6&gt;</code></td><td>Überschriften (h1 = größte)</td></tr>
+              <tr><td><code>&lt;p&gt;</code></td><td>Absatz (Paragraph)</td></tr>
+              <tr><td><code>&lt;br /&gt;</code></td><td>Zeilenumbruch</td></tr>
+              <tr><td><code>&lt;strong&gt;</code></td><td><strong>Fett</strong> (wichtig)</td></tr>
+              <tr><td><code>&lt;em&gt;</code></td><td><em>Kursiv</em> (betont)</td></tr>
+              <tr><td><code>&lt;span&gt;</code></td><td>Inline-Container (kein eigener Stil)</td></tr>
+              <tr><td><code>&lt;blockquote&gt;</code></td><td>Zitat-Block</td></tr>
+            </table>
+          </section>
+
+          <!-- Links & Bilder -->
+          <section class="card">
+            <h3>Links &amp; Bilder</h3>
+            <pre><code>&lt;!-- Link --&gt;
+&lt;a href="https://example.com"
+   target="_blank"&gt;
+  Klick mich
+&lt;/a&gt;
+
+&lt;!-- Bild --&gt;
+&lt;img src="bild.jpg"
+     alt="Beschreibung"
+     width="300" /&gt;</code></pre>
+            <div class="hint"><code>alt</code> ist Pflicht für Barrierefreiheit!</div>
+          </section>
+
+          <!-- Listen -->
+          <section class="card">
+            <h3>Listen</h3>
+            <pre><code>&lt;!-- Ungeordnete Liste --&gt;
+&lt;ul&gt;
+  &lt;li&gt;Punkt 1&lt;/li&gt;
+  &lt;li&gt;Punkt 2&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Geordnete Liste --&gt;
+&lt;ol&gt;
+  &lt;li&gt;Erster&lt;/li&gt;
+  &lt;li&gt;Zweiter&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+          </section>
+
+          <!-- Semantische Elemente -->
+          <section class="card">
+            <h3>Semantische Elemente</h3>
+            <table class="ref-table">
+              <tr><td><code>&lt;header&gt;</code></td><td>Kopfbereich</td></tr>
+              <tr><td><code>&lt;nav&gt;</code></td><td>Navigation</td></tr>
+              <tr><td><code>&lt;main&gt;</code></td><td>Hauptinhalt</td></tr>
+              <tr><td><code>&lt;section&gt;</code></td><td>Thematischer Abschnitt</td></tr>
+              <tr><td><code>&lt;article&gt;</code></td><td>Eigenständiger Inhalt</td></tr>
+              <tr><td><code>&lt;aside&gt;</code></td><td>Seitenleiste / Zusatzinfo</td></tr>
+              <tr><td><code>&lt;footer&gt;</code></td><td>Fußbereich</td></tr>
+            </table>
+            <div class="hint">Semantische Elemente helfen Suchmaschinen &amp; Screenreadern.</div>
+          </section>
+
+          <!-- Formulare -->
+          <section class="card">
+            <h3>Formulare</h3>
+            <pre><code>&lt;form action="/senden" method="POST"&gt;
+  &lt;label for="name"&gt;Name:&lt;/label&gt;
+  &lt;input type="text" id="name"
+         placeholder="Dein Name" /&gt;
+
+  &lt;label for="email"&gt;E-Mail:&lt;/label&gt;
+  &lt;input type="email" id="email" /&gt;
+
+  &lt;label for="pw"&gt;Passwort:&lt;/label&gt;
+  &lt;input type="password" id="pw" /&gt;
+
+  &lt;button type="submit"&gt;
+    Absenden
+  &lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          </section>
+
+          <!-- Input-Typen -->
+          <section class="card">
+            <h3>Wichtige Input-Typen</h3>
+            <table class="ref-table">
+              <tr><td><code>text</code></td><td>Einzeiliges Textfeld</td></tr>
+              <tr><td><code>email</code></td><td>E-Mail (mit Validierung)</td></tr>
+              <tr><td><code>password</code></td><td>Passwort (versteckt)</td></tr>
+              <tr><td><code>number</code></td><td>Zahleneingabe</td></tr>
+              <tr><td><code>checkbox</code></td><td>Ankreuzfeld</td></tr>
+              <tr><td><code>radio</code></td><td>Auswahlknopf (eine Option)</td></tr>
+              <tr><td><code>date</code></td><td>Datumsauswahl</td></tr>
+              <tr><td><code>submit</code></td><td>Absende-Button</td></tr>
+            </table>
+          </section>
+
+          <!-- Tabellen -->
+          <section class="card">
+            <h3>Tabellen</h3>
+            <pre><code>&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Alter&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Anna&lt;/td&gt;
+      &lt;td&gt;28&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+          </section>
+
+          <!-- Wichtige Attribute -->
+          <section class="card">
+            <h3>Wichtige Attribute</h3>
+            <table class="ref-table">
+              <tr><td><code>id="..."</code></td><td>Eindeutige Kennung</td></tr>
+              <tr><td><code>class="..."</code></td><td>CSS-Klasse(n)</td></tr>
+              <tr><td><code>style="..."</code></td><td>Inline-CSS (vermeiden!)</td></tr>
+              <tr><td><code>src="..."</code></td><td>Quelle (Bilder, Scripts)</td></tr>
+              <tr><td><code>href="..."</code></td><td>Ziel-URL (Links, CSS)</td></tr>
+              <tr><td><code>alt="..."</code></td><td>Alternativtext (Bilder)</td></tr>
+              <tr><td><code>placeholder</code></td><td>Platzhaltertext (Inputs)</td></tr>
+              <tr><td><code>required</code></td><td>Pflichtfeld</td></tr>
+            </table>
+          </section>
+        </div>
+        <footer class="sheet-footer">Frontend Masterclass &ndash; Devkarriere &ndash; HTML Cheatsheet</footer>
+      </div>
+
+      <!-- ================================ -->
+      <!-- CSS CHEATSHEET                   -->
+      <!-- ================================ -->
+      <div class="cheatsheet" id="css">
+        <div class="sheet-header">
+          <h2>CSS Cheatsheet</h2>
+          <p class="sheet-subtitle">Cascading Style Sheets &ndash; Das Aussehen deiner Webseite</p>
+        </div>
+
+        <div class="grid">
+          <!-- Selektoren -->
+          <section class="card">
+            <h3>Selektoren</h3>
+            <pre><code>/* Element */
+p { color: blue; }
+
+/* Klasse */
+.card { background: white; }
+
+/* ID */
+#header { height: 60px; }
+
+/* Verschachtelt */
+nav a { color: red; }
+
+/* Direkt Kind */
+ul > li { margin: 5px; }
+
+/* Mehrere Elemente */
+h1, h2, h3 { font-weight: bold; }</code></pre>
+          </section>
+
+          <!-- Box-Modell -->
+          <section class="card">
+            <h3>Box-Modell</h3>
+            <div class="box-model-visual">
+              <div class="bm-margin">margin
+                <div class="bm-border">border
+                  <div class="bm-padding">padding
+                    <div class="bm-content">content</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <pre><code>.box {
+  margin: 20px;      /* Außenabstand */
+  border: 1px solid; /* Rahmen */
+  padding: 15px;     /* Innenabstand */
+  width: 200px;      /* Breite */
+
+  /* Wichtig! */
+  box-sizing: border-box;
+}</code></pre>
+          </section>
+
+          <!-- Display -->
+          <section class="card">
+            <h3>Display-Typen</h3>
+            <table class="ref-table">
+              <tr><td><code>block</code></td><td>Volle Breite, neue Zeile</td></tr>
+              <tr><td><code>inline</code></td><td>Nur so breit wie Inhalt</td></tr>
+              <tr><td><code>inline-block</code></td><td>Inline + Breite/Höhe</td></tr>
+              <tr><td><code>flex</code></td><td>Flexbox-Container</td></tr>
+              <tr><td><code>grid</code></td><td>Grid-Container</td></tr>
+              <tr><td><code>none</code></td><td>Element verstecken</td></tr>
+            </table>
+          </section>
+
+          <!-- Flexbox -->
+          <section class="card">
+            <h3>Flexbox</h3>
+            <pre><code>.container {
+  display: flex;
+
+  /* Hauptachse */
+  justify-content: center;
+  /* flex-start | flex-end |
+     center | space-between |
+     space-around */
+
+  /* Querachse */
+  align-items: center;
+  /* flex-start | flex-end |
+     center | stretch */
+
+  /* Richtung */
+  flex-direction: row;
+  /* row | column |
+     row-reverse | column-reverse */
+
+  /* Umbruch */
+  flex-wrap: wrap;
+
+  /* Abstand */
+  gap: 1rem;
+}</code></pre>
+          </section>
+
+          <!-- Positionierung -->
+          <section class="card">
+            <h3>Positionierung</h3>
+            <table class="ref-table">
+              <tr><td><code>static</code></td><td>Normal (Standard)</td></tr>
+              <tr><td><code>relative</code></td><td>Relativ zur Normalposition</td></tr>
+              <tr><td><code>absolute</code></td><td>Relativ zum nächsten rel. Elternteil</td></tr>
+              <tr><td><code>fixed</code></td><td>Fixiert im Viewport</td></tr>
+              <tr><td><code>sticky</code></td><td>Klebt beim Scrollen</td></tr>
+            </table>
+            <pre><code>.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}</code></pre>
+          </section>
+
+          <!-- Farben -->
+          <section class="card">
+            <h3>Farben &amp; Hintergründe</h3>
+            <pre><code>/* Textfarbe */
+color: #ff6600;
+color: rgb(255, 102, 0);
+color: hsl(24, 100%, 50%);
+
+/* Hintergrund */
+background-color: #f0f0f0;
+background-image: url("bg.jpg");
+background-size: cover;
+background-position: center;
+
+/* Transparenz */
+opacity: 0.8;
+color: rgba(0, 0, 0, 0.5);</code></pre>
+          </section>
+
+          <!-- Typografie -->
+          <section class="card">
+            <h3>Typografie</h3>
+            <pre><code>font-family: Arial, sans-serif;
+font-size: 1rem;
+font-weight: bold;   /* 100 - 900 */
+font-style: italic;
+
+line-height: 1.5;
+text-align: center;
+text-decoration: underline;
+text-transform: uppercase;
+letter-spacing: 0.05em;</code></pre>
+          </section>
+
+          <!-- Einheiten -->
+          <section class="card">
+            <h3>Wichtige Einheiten</h3>
+            <table class="ref-table">
+              <tr><td><code>px</code></td><td>Pixel (fest)</td></tr>
+              <tr><td><code>rem</code></td><td>Relativ zur Root-Schriftgröße</td></tr>
+              <tr><td><code>em</code></td><td>Relativ zur Eltern-Schriftgröße</td></tr>
+              <tr><td><code>%</code></td><td>Prozent des Elternelements</td></tr>
+              <tr><td><code>vw</code></td><td>Prozent der Viewport-Breite</td></tr>
+              <tr><td><code>vh</code></td><td>Prozent der Viewport-Höhe</td></tr>
+            </table>
+            <div class="hint"><code>rem</code> ist meistens die beste Wahl für responsive Designs.</div>
+          </section>
+
+          <!-- Pseudo-Klassen & Responsive -->
+          <section class="card">
+            <h3>Pseudo-Klassen &amp; Responsive</h3>
+            <pre><code>/* Pseudo-Klassen */
+a:hover { color: red; }
+input:focus { border-color: blue; }
+li:first-child { font-weight: bold; }
+li:nth-child(2n) { background: #eee; }
+
+/* Media Query */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+}</code></pre>
+          </section>
+        </div>
+        <footer class="sheet-footer">Frontend Masterclass &ndash; Devkarriere &ndash; CSS Cheatsheet</footer>
+      </div>
+
+      <!-- ================================ -->
+      <!-- JAVASCRIPT CHEATSHEET            -->
+      <!-- ================================ -->
+      <div class="cheatsheet" id="js">
+        <div class="sheet-header">
+          <h2>JavaScript Cheatsheet</h2>
+          <p class="sheet-subtitle">Die Programmiersprache des Webs &ndash; Interaktivität &amp; Logik</p>
+        </div>
+
+        <div class="grid">
+          <!-- Variablen -->
+          <section class="card">
+            <h3>Variablen</h3>
+            <pre><code>// Veränderbar
+let name = "Anna";
+name = "Max";    // OK
+
+// Konstante (nicht neu zuweisbar)
+const PI = 3.14;
+PI = 3;          // Fehler!
+
+// var (veraltet, vermeiden!)
+var alt = "nicht nutzen";</code></pre>
+            <div class="hint">Nutze <code>const</code> als Standard, <code>let</code> nur wenn nötig.</div>
+          </section>
+
+          <!-- Datentypen -->
+          <section class="card">
+            <h3>Datentypen</h3>
+            <table class="ref-table">
+              <tr><td><code>String</code></td><td><code>"Hallo"</code> oder <code>'Hallo'</code></td></tr>
+              <tr><td><code>Number</code></td><td><code>42</code>, <code>3.14</code></td></tr>
+              <tr><td><code>Boolean</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>Array</code></td><td><code>[1, 2, 3]</code></td></tr>
+              <tr><td><code>Object</code></td><td><code>{ name: "Max" }</code></td></tr>
+              <tr><td><code>null</code></td><td>Absichtlich leer</td></tr>
+              <tr><td><code>undefined</code></td><td>Noch kein Wert zugewiesen</td></tr>
+            </table>
+            <pre><code>// Typ prüfen
+typeof "Hallo";  // "string"
+typeof 42;       // "number"
+typeof true;     // "boolean"</code></pre>
+          </section>
+
+          <!-- Operatoren -->
+          <section class="card">
+            <h3>Operatoren</h3>
+            <pre><code>// Arithmetisch
++  -  *  /  %  **
+
+// Vergleich
+===  // gleich (strikt)
+!==  // ungleich (strikt)
+>  <  >=  <=
+
+// Logisch
+&&   // UND
+||   // ODER
+!    // NICHT
+
+// String-Verkettung
+"Hallo " + "Welt"
+`Hallo ${name}`  // Template Literal</code></pre>
+            <div class="hint">Immer <code>===</code> statt <code>==</code> verwenden!</div>
+          </section>
+
+          <!-- Bedingungen -->
+          <section class="card">
+            <h3>Bedingungen</h3>
+            <pre><code>if (alter >= 18) {
+  console.log("Volljährig");
+} else if (alter >= 16) {
+  console.log("Fast volljährig");
+} else {
+  console.log("Minderjährig");
+}
+
+// Ternary Operator (Kurzform)
+let status = alter >= 18
+  ? "Erwachsen"
+  : "Minderjährig";</code></pre>
+          </section>
+
+          <!-- Schleifen -->
+          <section class="card">
+            <h3>Schleifen</h3>
+            <pre><code>// for-Schleife
+for (let i = 0; i < 5; i++) {
+  console.log(i);  // 0, 1, 2, 3, 4
+}
+
+// for...of (Arrays)
+const farben = ["rot", "grün", "blau"];
+for (const farbe of farben) {
+  console.log(farbe);
+}
+
+// while
+let count = 0;
+while (count < 3) {
+  console.log(count);
+  count++;
+}</code></pre>
+          </section>
+
+          <!-- Funktionen -->
+          <section class="card">
+            <h3>Funktionen</h3>
+            <pre><code>// Funktionsdeklaration
+function greet(name) {
+  return "Hallo " + name;
+}
+
+// Arrow Function
+const greet = (name) => {
+  return "Hallo " + name;
+};
+
+// Kurzform (eine Zeile)
+const double = (n) => n * 2;
+
+// Aufrufen
+greet("Max");    // "Hallo Max"
+double(5);       // 10</code></pre>
+          </section>
+
+          <!-- Arrays -->
+          <section class="card">
+            <h3>Arrays &amp; Methoden</h3>
+            <pre><code>const fruits = ["Apfel", "Birne"];
+
+fruits.push("Kirsche");   // Hinzufügen
+fruits.pop();             // Letztes entfernen
+fruits.length;            // Anzahl
+fruits[0];                // "Apfel"
+fruits.includes("Birne"); // true
+
+// Iteration
+fruits.forEach((fruit) => {
+  console.log(fruit);
+});
+
+// Transformieren
+const upper = fruits.map(
+  (f) => f.toUpperCase()
+);
+
+// Filtern
+const short = fruits.filter(
+  (f) => f.length < 6
+);</code></pre>
+          </section>
+
+          <!-- Objekte -->
+          <section class="card">
+            <h3>Objekte</h3>
+            <pre><code>const person = {
+  name: "Max",
+  alter: 25,
+  hobbys: ["Lesen", "Coden"]
+};
+
+// Zugriff
+person.name;          // "Max"
+person["alter"];      // 25
+
+// Ändern / Hinzufügen
+person.email = "max@mail.de";
+
+// Destructuring
+const { name, alter } = person;</code></pre>
+          </section>
+
+          <!-- DOM-Manipulation -->
+          <section class="card">
+            <h3>DOM-Manipulation</h3>
+            <pre><code>// Element finden
+const el = document
+  .getElementById("title");
+const items = document
+  .querySelectorAll(".item");
+
+// Inhalt ändern
+el.textContent = "Neuer Text";
+el.innerHTML = "&lt;b&gt;Fett&lt;/b&gt;";
+
+// Klassen
+el.classList.add("active");
+el.classList.remove("active");
+el.classList.toggle("active");
+
+// Styles
+el.style.color = "red";
+el.style.display = "none";</code></pre>
+          </section>
+
+          <!-- Events -->
+          <section class="card">
+            <h3>Events</h3>
+            <pre><code>const btn = document
+  .getElementById("myBtn");
+
+btn.addEventListener("click",
+  function() {
+    alert("Klick!");
+  }
+);
+
+// Häufige Events:
+// "click"       Mausklick
+// "input"       Eingabe in Input
+// "submit"      Formular absenden
+// "keydown"     Taste gedrückt
+// "mouseover"   Maus drüber
+// "load"        Seite geladen</code></pre>
+          </section>
+
+          <!-- String-Methoden -->
+          <section class="card">
+            <h3>String-Methoden</h3>
+            <pre><code>const text = "Hallo Welt";
+
+text.length;          // 10
+text.toUpperCase();   // "HALLO WELT"
+text.toLowerCase();   // "hallo welt"
+text.includes("Welt"); // true
+text.indexOf("Welt");  // 6
+text.slice(0, 5);      // "Hallo"
+text.split(" ");       // ["Hallo","Welt"]
+text.trim();           // Leerzeichen weg
+text.replace("Welt", "JS");
+// "Hallo JS"</code></pre>
+          </section>
+
+          <!-- Console & Debugging -->
+          <section class="card">
+            <h3>Konsole &amp; Debugging</h3>
+            <pre><code>console.log("Info");
+console.warn("Warnung");
+console.error("Fehler");
+console.table([1, 2, 3]);
+
+// Typ prüfen
+typeof variable;
+Array.isArray(myArr);
+
+// Häufige Fehler:
+// ReferenceError
+//   → Variable nicht definiert
+// TypeError
+//   → Falscher Typ / Methode
+// SyntaxError
+//   → Tippfehler im Code</code></pre>
+          </section>
+        </div>
+        <footer class="sheet-footer">Frontend Masterclass &ndash; Devkarriere &ndash; JavaScript Cheatsheet</footer>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

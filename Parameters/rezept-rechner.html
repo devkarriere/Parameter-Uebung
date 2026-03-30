@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projekt: Rezept-Rechner</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .ingredient-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #334155;
+        font-family: monospace;
+        font-size: 0.95rem;
+      }
+      .ingredient-row:last-child {
+        border-bottom: none;
+      }
+      .ingredient-amount {
+        color: #f59e0b;
+        font-weight: 700;
+        min-width: 60px;
+        text-align: right;
+      }
+      .ingredient-unit {
+        color: #94a3b8;
+        min-width: 30px;
+      }
+      .ingredient-name {
+        color: #e2e8f0;
+      }
+      .serving-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+      }
+      .serving-controls label {
+        color: #94a3b8;
+        font-size: 0.95rem;
+      }
+      .serving-controls input[type="number"] {
+        width: 70px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 0.5rem 0.6rem;
+        font-size: 1rem;
+        text-align: center;
+        font-family: "Fira Code", monospace;
+      }
+      .serving-controls input[type="number"]:focus {
+        outline: none;
+        border-color: #38bdf8;
+      }
+      .recipe-card {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 1.2rem;
+        margin-top: 0.8rem;
+      }
+      .recipe-title {
+        color: #f59e0b;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.8rem;
+      }
+      .cost-display {
+        margin-top: 1rem;
+        padding: 0.8rem 1rem;
+        background: #14532d;
+        border-radius: 8px;
+        color: #86efac;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Projekt: Rezept-Rechner</h1>
+      <p class="subtitle">Portionen umrechnen mit Funktionen & Parametern</p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Der Rezept-Rechner</h2>
+        <p>
+          Baue einen Rechner, der Rezept-Zutaten automatisch auf eine gewünschte
+          Personenanzahl umrechnet. Du arbeitest mit
+          <strong>Arrays</strong>, <strong>Funktionen</strong>,
+          <strong>Parametern</strong> und <strong>Rückgabewerten</strong>.
+        </p>
+        <p>
+          Erstelle eine neue Datei <code>rezept.js</code> und binde sie in eine
+          HTML-Datei ein.
+        </p>
+
+        <!-- Schritt 1 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>Rezept-Daten als globale Variable</h3>
+          </div>
+          <p>
+            Erstelle ein Rezept-Objekt mit einem Namen, der Basis-Personenanzahl
+            und einem Array von Zutaten. Jede Zutat hat eine Menge, eine Einheit
+            und einen Namen.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>const recipe = {
+  name: "Pfannkuchen",
+  servings: 4,
+  ingredients: [
+    { amount: 300, unit: "g", name: "Mehl" },
+    { amount: 3, unit: "Stk", name: "Eier" },
+    { amount: 500, unit: "ml", name: "Milch" },
+    { amount: 50, unit: "g", name: "Zucker" },
+    { amount: 1, unit: "Prise", name: "Salz" },
+    { amount: 30, unit: "g", name: "Butter" }
+  ]
+};</code></pre>
+            <div class="hint">
+              <strong>Beachte:</strong> Das Rezept ist für
+              <strong>4 Personen</strong>. Alle Mengen beziehen sich darauf.
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 2 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Umrechnungsfaktor berechnen</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>calculateFactor</code>, die die
+            <strong>Basis-Portionen</strong> und die
+            <strong>gewünschten Portionen</strong> als Parameter bekommt und den
+            Umrechnungsfaktor zurückgibt. Wenn wir also ein Rezept für 4
+            Personen haben und wir daraus 6 Portionen machen, dann übergeben wir
+            4 und 6 und erhalten den Faktor 1.5
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function calculateFactor(baseServings, targetServings) {
+  let factor = targetServings / baseServings;
+  return factor;
+}</code></pre>
+            <div class="visual">
+              <div class="flow">
+                <span class="tag var">baseServings <small>4</small></span>
+                <span class="tag var">targetServings <small>6</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag return-tag">return <small>1.5</small></span>
+              </div>
+              <p class="caption">
+                6 Portionen &divide; 4 Basis-Portionen = Faktor 1.5
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 3 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>Einzelne Zutat umrechnen</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>scaleIngredient</code>, die eine
+            <strong>einzelne Zutat</strong> und einen <strong>Faktor</strong>
+            als Parameter bekommt. Sie soll ein neues Objekt mit der
+            umgerechneten Menge zurückgeben. Runde das Ergebnis auf eine
+            Nachkommastelle.
+          </p>
+          <p>
+            Die übergebene Zutat soll also Objekt übergeben werden (siehe dein
+            Format aus Aufgabe 1). Die darin enthaltene Menge wird mit dem
+            Faktor multipliziert, gerundet und wieder im gleichen Format als
+            Objekt zurückgegeben
+          </p>
+          <div class="hint">
+            <strong>Tipp:</strong> <code>Math.round()</code> rundet auf ganze
+            Zahlen. Um auf <em>eine</em> Nachkommastelle zu runden,
+            multipliziere vorher mit 10, runde, und teile wieder durch 10:<br />
+            <code>Math.round(2.76 * 10) / 10</code> &rarr; <code>2.8</code
+            ><br />
+            <code>2.76 * 10</code> = <code>27.6</code> &rarr;
+            <code>Math.round(27.6)</code> = <code>28</code> &rarr;
+            <code>28 / 10</code> = <code>2.8</code>
+          </div>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function scaleIngredient(ingredient, factor) {
+  let newAmount = ingredient.amount * factor;
+  let rounded = Math.round(newAmount * 10) / 10;
+
+  return {
+    amount: rounded,
+    unit: ingredient.unit,
+    name: ingredient.name
+  };
+}</code></pre>
+            <div class="hint">
+              <strong>Wichtig:</strong> Der Parameter heißt
+              <code>ingredient</code> (Singular) &ndash; die Funktion bearbeitet
+              immer nur <em>eine</em> Zutat, nicht das ganze Array.
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 4 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>Alle Zutaten umrechnen</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>scaleRecipe</code>, die das
+            <strong>Zutaten-Array</strong>, die
+            <strong>Basis-Portionen</strong> und die
+            <strong>Ziel-Portionen</strong> als Parameter bekommt. Sie soll
+            <code>calculateFactor</code> und <code>scaleIngredient</code>
+            aufrufen und ein Array mit allen umgerechneten Zutaten zurückgeben.
+            Bedeutet, wenn die Ziel-Portion 6 und die Basis-Portionen des
+            Rezepts 4 sind, wird die Funktion scaleIngredient mit den passenden
+            Parametern aufgerufen
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function scaleRecipe(ingredients, baseServings, targetServings) {
+  let factor = calculateFactor(baseServings, targetServings);
+  let scaled = [];
+
+  for (let i = 0; i &lt; ingredients.length; i++) {
+    let newIngredient = scaleIngredient(ingredients[i], factor);
+    scaled.push(newIngredient);
+  }
+
+  return scaled;
+}</code></pre>
+            <div class="call-chain">
+              <h4>Funktionsaufruf-Kette:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  scaleRecipe(ingredients, 4, 6)
+                  <div class="chain-item sub-fn">
+                    calculateFactor(4, 6) &rarr; 1.5
+                  </div>
+                  <div class="chain-item sub-fn">
+                    scaleIngredient(ingredients[0], 1.5)
+                  </div>
+                  <div class="chain-item sub-fn">
+                    scaleIngredient(ingredients[1], 1.5)
+                  </div>
+                  <div class="chain-item sub-fn">... (für jede Zutat)</div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Schritt 5 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>Rezept formatiert ausgeben</h3>
+          </div>
+          <p>
+            Schreibe eine Funktion <code>formatRecipe</code>, die den
+            <strong>Rezept-Namen</strong>, die <strong>Portionen</strong> und
+            das <strong>skalierte Zutaten-Array</strong> als Parameter bekommt.
+            Sie soll das Rezept formatiert in der Konsole ausgeben.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>function formatRecipe(recipeName, servings, ingredients) {
+  console.log("=== " + recipeName + " ===");
+  console.log("Portionen: " + servings);
+  console.log("");
+
+  for (let i = 0; i &lt; ingredients.length; i++) {
+    let ing = ingredients[i];
+    console.log(ing.amount + " " + ing.unit + " " + ing.name);
+  }
+}</code></pre>
+          </details>
+        </div>
+
+        <!-- Schritt 6 -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">6</span>
+            <h3>Alles zusammenführen und testen</h3>
+          </div>
+          <p>
+            Rufe die Funktionen auf: Rechne das Rezept auf 6 Portionen um und
+            gib es in der Konsole aus.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>// === Rezept-Daten ===
+const recipe = {
+  name: "Pfannkuchen",
+  servings: 4,
+  ingredients: [
+    { amount: 300, unit: "g", name: "Mehl" },
+    { amount: 3, unit: "Stk", name: "Eier" },
+    { amount: 500, unit: "ml", name: "Milch" },
+    { amount: 50, unit: "g", name: "Zucker" },
+    { amount: 1, unit: "Prise", name: "Salz" },
+    { amount: 30, unit: "g", name: "Butter" }
+  ]
+};
+
+// === Funktionen ===
+function calculateFactor(baseServings, targetServings) {
+  let factor = targetServings / baseServings;
+  return factor;
+}
+
+function scaleIngredient(ingredient, factor) {
+  let newAmount = ingredient.amount * factor;
+  let rounded = Math.round(newAmount * 10) / 10;
+
+  return {
+    amount: rounded,
+    unit: ingredient.unit,
+    name: ingredient.name
+  };
+}
+
+function scaleRecipe(ingredients, baseServings, targetServings) {
+  let factor = calculateFactor(baseServings, targetServings);
+  let scaled = [];
+
+  for (let i = 0; i &lt; ingredients.length; i++) {
+    let newIngredient = scaleIngredient(ingredients[i], factor);
+    scaled.push(newIngredient);
+  }
+
+  return scaled;
+}
+
+function formatRecipe(recipeName, servings, ingredients) {
+  console.log("=== " + recipeName + " ===");
+  console.log("Portionen: " + servings);
+  console.log("");
+
+  for (let i = 0; i &lt; ingredients.length; i++) {
+    let ing = ingredients[i];
+    console.log(ing.amount + " " + ing.unit + " " + ing.name);
+  }
+}
+
+// === Aufrufen und testen ===
+let scaledIngredients = scaleRecipe(recipe.ingredients, recipe.servings, 6);
+formatRecipe(recipe.name, 6, scaledIngredients);</code></pre>
+            <div class="hint">
+              <strong>Tipp:</strong> Probiere verschiedene Portionszahlen aus
+              &ndash; z.B. 2, 10 oder 1!
+            </div>
+          </details>
+        </div>
+
+        <!-- Bonus -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Gesamtkosten berechnen</h3>
+          </div>
+          <p>
+            Erweitere das Rezept um Preise pro Einheit und schreibe eine
+            Funktion <code>calculateCost</code>, die die Gesamtkosten für die
+            skalierten Zutaten berechnet.
+          </p>
+          <details class="solution">
+            <summary>Lösung anzeigen</summary>
+            <pre><code>const recipeWithPrices = {
+  name: "Pfannkuchen",
+  servings: 4,
+  ingredients: [
+    { amount: 300, unit: "g", name: "Mehl", pricePerUnit: 0.002 },
+    { amount: 3, unit: "Stk", name: "Eier", pricePerUnit: 0.35 },
+    { amount: 500, unit: "ml", name: "Milch", pricePerUnit: 0.002 },
+    { amount: 50, unit: "g", name: "Zucker", pricePerUnit: 0.002 },
+    { amount: 1, unit: "Prise", name: "Salz", pricePerUnit: 0.01 },
+    { amount: 30, unit: "g", name: "Butter", pricePerUnit: 0.01 }
+  ]
+};
+
+function calculateCost(ingredients) {
+  let total = 0;
+
+  for (let i = 0; i &lt; ingredients.length; i++) {
+    let cost = ingredients[i].amount * ingredients[i].pricePerUnit;
+    total = total + cost;
+  }
+
+  let rounded = Math.round(total * 100) / 100;
+  return rounded;
+}
+
+let cost = calculateCost(recipeWithPrices.ingredients);
+console.log("Gesamtkosten: " + cost + " €");</code></pre>
+          </details>
+        </div>
+
+        <!-- Live-Demo -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+          <p>
+            Ändere die Portionenzahl und sieh, wie sich die Zutaten automatisch
+            anpassen.
+          </p>
+          <div class="serving-controls">
+            <label for="servings-input">Portionen:</label>
+            <input
+              type="number"
+              id="servings-input"
+              value="4"
+              min="1"
+              max="50"
+            />
+            <button id="btn-calculate">Umrechnen</button>
+          </div>
+          <div class="recipe-card">
+            <div class="recipe-title" id="recipe-title">
+              Pfannkuchen (4 Portionen)
+            </div>
+            <div id="ingredients-display"></div>
+          </div>
+          <div id="recipe-output" class="output"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script>
+      // === Rezept-Daten ===
+      const recipe = {
+        name: "Pfannkuchen",
+        servings: 4,
+        ingredients: [
+          { amount: 300, unit: "g", name: "Mehl" },
+          { amount: 3, unit: "Stk", name: "Eier" },
+          { amount: 500, unit: "ml", name: "Milch" },
+          { amount: 50, unit: "g", name: "Zucker" },
+          { amount: 1, unit: "Prise", name: "Salz" },
+          { amount: 30, unit: "g", name: "Butter" },
+        ],
+      };
+
+      // === Funktionen ===
+      function calculateFactor(baseServings, targetServings) {
+        let factor = targetServings / baseServings;
+        return factor;
+      }
+
+      function scaleIngredient(ingredient, factor) {
+        let newAmount = ingredient.amount * factor;
+        let rounded = Math.round(newAmount * 10) / 10;
+        return {
+          amount: rounded,
+          unit: ingredient.unit,
+          name: ingredient.name,
+        };
+      }
+
+      function scaleRecipe(ingredients, baseServings, targetServings) {
+        let factor = calculateFactor(baseServings, targetServings);
+        let scaled = [];
+        for (let i = 0; i < ingredients.length; i++) {
+          let newIngredient = scaleIngredient(ingredients[i], factor);
+          scaled.push(newIngredient);
+        }
+        return scaled;
+      }
+
+      function formatRecipe(recipeName, servings, ingredients) {
+        console.log("=== " + recipeName + " ===");
+        console.log("Portionen: " + servings);
+        console.log("");
+        for (let i = 0; i < ingredients.length; i++) {
+          let ing = ingredients[i];
+          console.log(ing.amount + " " + ing.unit + " " + ing.name);
+        }
+      }
+
+      // === UI aktualisieren ===
+      function renderIngredients(ingredients) {
+        let container = document.getElementById("ingredients-display");
+        container.innerHTML = "";
+        for (let i = 0; i < ingredients.length; i++) {
+          let row = document.createElement("div");
+          row.className = "ingredient-row";
+          row.innerHTML =
+            '<span class="ingredient-amount">' +
+            ingredients[i].amount +
+            "</span>" +
+            '<span class="ingredient-unit">' +
+            ingredients[i].unit +
+            "</span>" +
+            '<span class="ingredient-name">' +
+            ingredients[i].name +
+            "</span>";
+          container.appendChild(row);
+        }
+      }
+
+      // === Initiale Anzeige ===
+      renderIngredients(recipe.ingredients);
+
+      // === Button-Event ===
+      document
+        .getElementById("btn-calculate")
+        .addEventListener("click", function () {
+          let target = parseInt(
+            document.getElementById("servings-input").value,
+          );
+          if (isNaN(target) || target < 1) {
+            target = 1;
+            document.getElementById("servings-input").value = 1;
+          }
+
+          let scaled = scaleRecipe(recipe.ingredients, recipe.servings, target);
+          formatRecipe(recipe.name, target, scaled);
+
+          document.getElementById("recipe-title").textContent =
+            recipe.name + " (" + target + " Portionen)";
+
+          renderIngredients(scaled);
+
+          let output = document.getElementById("recipe-output");
+          output.textContent = "=== " + recipe.name + " ===\n";
+          output.textContent += "Portionen: " + target + "\n\n";
+          for (let i = 0; i < scaled.length; i++) {
+            let ing = scaled[i];
+            output.textContent +=
+              ing.amount + " " + ing.unit + " " + ing.name + "\n";
+          }
+          output.textContent +=
+            "\nFaktor: " + calculateFactor(recipe.servings, target);
+        });
+    </script>
+  </body>
+</html>
