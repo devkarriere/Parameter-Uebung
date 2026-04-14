@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>&Uuml;bung: Tier-Steckbrief-App</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- React CDN f&uuml;r Live-Demo -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      .animal-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 2px solid #334155;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition:
+          border-color 0.3s,
+          transform 0.2s;
+        cursor: pointer;
+      }
+      .animal-card:hover {
+        border-color: #38bdf8;
+        transform: translateY(-2px);
+      }
+      .animal-card .emoji {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      .animal-card .name {
+        color: #38bdf8;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+      }
+      .animal-card .info {
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+      .animal-card .fact {
+        background: #1a2744;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin-top: 0.8rem;
+        font-size: 0.85rem;
+        color: #e2e8f0;
+      }
+      .animal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      .search-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .search-bar input {
+        flex: 1;
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .search-bar input:focus {
+        border-color: #38bdf8;
+      }
+      .loading-spinner {
+        text-align: center;
+        padding: 2rem;
+        color: #94a3b8;
+        font-size: 1.1rem;
+      }
+      .detail-view {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+      }
+      .detail-view .emoji {
+        font-size: 4rem;
+      }
+      .detail-view h3 {
+        color: #38bdf8;
+        margin: 0.5rem 0;
+      }
+      .back-btn {
+        background: #334155;
+        margin-bottom: 1rem;
+      }
+      .back-btn:hover {
+        background: #475569;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&Uuml;bung: Die Tier-Steckbrief-App</h1>
+      <p class="subtitle">
+        TypeScript, useEffect, useRef &amp; Routing &ndash; Schritt f&uuml;r
+        Schritt
+      </p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Gef&uuml;hrte Aufgabe: Die Tier-Steckbrief-App</h2>
+        <p>
+          Du baust eine App, die Tier-Steckbriefe anzeigt. Dabei lernst du
+          TypeScript-Interfaces, <code>useEffect</code> zum Daten laden,
+          <code>useRef</code> f&uuml;r den Fokus auf ein Suchfeld und einfaches
+          Routing.
+        </p>
+
+        <div class="hint">
+          <strong>Vorbereitung:</strong> Erstelle ein neues Vite-Projekt mit
+          TypeScript:<br />
+          <code
+            >npm create vite@latest tier-steckbrief -- --template react-ts</code
+          ><br />
+          <code>cd tier-steckbrief</code><br />
+          <code>npm install</code><br />
+          <code>npm install react-router-dom</code><br />
+          <code>npm run dev</code>
+        </div>
+
+        <!-- ======== Schritt 1 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>Das TypeScript-Interface f&uuml;r Tiere</h3>
+          </div>
+          <p>
+            Zuerst definierst du einen <strong>Bauplan</strong> f&uuml;r deine
+            Tier-Daten. Erstelle eine Datei <code>src/types/index.ts</code> mit
+            einem Interface, das beschreibt, welche Eigenschaften ein Tier hat:
+            <code>id</code> (Zahl), <code>name</code> (Text),
+            <code>emoji</code> (Text), <code>habitat</code> (Text),
+            <code>funFact</code> (Text) und <code>dangerous</code>
+            (Wahr/Falsch).
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/types/index.ts
+
+export interface Animal {
+  id: number;
+  name: string;
+  emoji: string;
+  habitat: string;
+  funFact: string;
+  dangerous: boolean;
+}</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> Das <code>export</code> vor dem
+              Interface macht es in anderen Dateien verf&uuml;gbar. Ohne
+              <code>export</code> k&ouml;nntest du es nicht importieren.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 2 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Die AnimalCard-Komponente mit typisierten Props</h3>
+          </div>
+          <p>
+            Erstelle eine Datei
+            <code>src/components/AnimalCard/AnimalCard.tsx</code>. Die
+            Komponente bekommt ein Tier-Objekt als Prop und zeigt Emoji, Name,
+            Lebensraum und ob das Tier gef&auml;hrlich ist. Wenn die Card
+            geklickt wurde, soll ebenfalls eine übergeben Funktion mit der id
+            als Parameter aufgerufen werden. Definiere ein eigenes Interface
+            f&uuml;r die Props dieser Komponente.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/components/AnimalCard/AnimalCard.tsx
+import { Animal } from "../../types";
+
+interface AnimalCardProps {
+  animal: Animal;
+  onClick: (id: number) =&gt; void;
+}
+
+function AnimalCard({ animal, onClick }: AnimalCardProps) {
+  return (
+    &lt;div
+      className="animal-card"
+      onClick={function () { onClick(animal.id); }}
+    &gt;
+      &lt;span className="emoji"&gt;{animal.emoji}&lt;/span&gt;
+      &lt;p className="name"&gt;{animal.name}&lt;/p&gt;
+      &lt;p className="info"&gt;{animal.habitat}&lt;/p&gt;
+      {animal.dangerous ? (
+        &lt;p className="info" style={{ color: "#ef4444" }}&gt;Gef&auml;hrlich!&lt;/p&gt;
+      ) : null}
+    &lt;/div&gt;
+  );
+}
+
+export default AnimalCard;</code></pre>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag type">Animal <small>Interface</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag prop">animal <small>Props</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag jsx">JSX <small>Anzeige</small></span>
+              </div>
+              <p class="caption">
+                Das Interface <code>Animal</code> wird im Props-Interface
+                verwendet. TypeScript stellt sicher, dass alle Felder vorhanden
+                sind.
+              </p>
+            </div>
+
+            <div class="hint">
+              <strong>Beachte:</strong> <code>onClick</code> ist hier eine
+              <strong>Callback-Funktion</strong> als Prop. Der Typ
+              <code>(id: number) =&gt; void</code> bedeutet: eine Funktion, die
+              eine Zahl bekommt und nichts zur&uuml;ckgibt.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 3 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>Home-Seite mit Tier-Karten</h3>
+          </div>
+          <p>
+            Erstelle die Datei
+            <code>src/views/Home/Home.tsx</code>. Die Komponente soll:
+          </p>
+          <ul>
+            <li>
+              Ein Array mit Tier-Daten als Konstante definieren
+            </li>
+            <li>
+              F&uuml;r jedes Tier eine <code>AnimalCard</code>-Komponente anzeigen
+            </li>
+            <li>
+              Die Liste mit <code>.map()</code> durchgehen und die Karten rendern
+            </li>
+          </ul>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/views/Home/Home.tsx
+import { Animal } from "../../types";
+import AnimalCard from "../../components/AnimalCard/AnimalCard";
+
+// Unsere Tier-Daten (sp&auml;ter k&ouml;nnten die von einer API kommen)
+const animalData: Animal[] = [
+  { id: 1, name: "Roter Panda", emoji: "🦊", habitat: "Asien", funFact: "Schl&auml;ft bis zu 17 Stunden am Tag", dangerous: false },
+  { id: 2, name: "Oktopus", emoji: "🐙", habitat: "Ozean", funFact: "Hat drei Herzen und blaues Blut", dangerous: false },
+  { id: 3, name: "Honigdachs", emoji: "🦡", habitat: "Afrika", funFact: "Gilt als das furchtloseste Tier der Welt", dangerous: true },
+  { id: 4, name: "Axolotl", emoji: "🦎", habitat: "Mexiko", funFact: "Kann verlorene K&ouml;rperteile nachwachsen lassen", dangerous: false },
+  { id: 5, name: "Qualle", emoji: "🪼", habitat: "Ozean", funFact: "Manche Quallen sind unsterblich", dangerous: true },
+  { id: 6, name: "Faultier", emoji: "🦥", habitat: "S&uuml;damerika", funFact: "Bewegt sich nur 40 Meter pro Tag", dangerous: false },
+];
+
+function Home() {
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Unsere Tiere&lt;/h2&gt;
+      &lt;div className="animal-grid"&gt;
+        {animalData.map(function (animal) {
+          return (
+            &lt;AnimalCard
+              key={animal.id}
+              animal={animal}
+            /&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default Home;</code></pre>
+
+            <div class="hint">
+              <strong>Tipp:</strong> Die Tier-Daten stehen hier direkt in der Datei.
+              In einer echten App w&uuml;rden sie sp&auml;ter von einer API geladen
+              werden. Vergiss nicht, bei <code>.map()</code> immer eine eindeutige
+              <code>key</code>-Prop zu setzen &ndash; hier nutzen wir die
+              <code>id</code> des Tieres.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 4 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>Suchfeld mit Filter-Funktion</h3>
+          </div>
+          <p>
+            F&uuml;ge ein Suchfeld zur <code>Home</code>-Komponente hinzu.
+            Ein <code>useState</code> soll den Suchbegriff speichern und die
+            Tier-Liste filtern.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// Erg&auml;nze die Imports in Home.tsx:
+import { useState } from "react";
+
+// Innerhalb der Home-Funktion:
+function Home() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Tiere filtern basierend auf Suchbegriff
+  const filteredAnimals = animalData.filter(function (animal) {
+    return animal.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Unsere Tiere&lt;/h2&gt;
+      &lt;div className="search-bar"&gt;
+        &lt;input
+          type="text"
+          placeholder="Tier suchen..."
+          value={searchTerm}
+          onChange={function (e) { setSearchTerm(e.target.value); }}
+        /&gt;
+      &lt;/div&gt;
+      &lt;div className="animal-grid"&gt;
+        {filteredAnimals.map(function (animal) {
+          return (
+            &lt;AnimalCard
+              key={animal.id}
+              animal={animal}
+            /&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <div class="hint">
+              <strong>Warum steht <code>filteredAnimals</code> einfach so in der Funktion &ndash; ohne useEffect?</strong><br />
+              Weil es eine <strong>Berechnung aus bestehendem State</strong> ist.
+              Jedes Mal wenn sich <code>searchTerm</code> &auml;ndert, rendert React die
+              Komponente neu &ndash; und dabei wird <code>filteredAnimals</code> automatisch
+              neu berechnet. Du brauchst <code>useEffect</code> nur f&uuml;r
+              <strong>Seiteneffekte</strong> &ndash; also Dinge, die
+              <em>au&szlig;erhalb</em> von React passieren (API-Aufrufe, Timer,
+              Dokument-Titel &auml;ndern etc.). Eine Filterung ist kein Seiteneffekt,
+              sondern einfach eine Ableitung aus dem State.
+            </div>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag state"
+                  >searchTerm <small>&auml;ndert sich</small></span
+                >
+                <span class="arrow">&rarr;</span>
+                <span class="tag callback"
+                  >Komponente <small>rendert neu</small></span
+                >
+                <span class="arrow">&rarr;</span>
+                <span class="tag hook"
+                  >filteredAnimals <small>wird neu berechnet</small></span
+                >
+              </div>
+              <p class="caption">
+                State-&Auml;nderung &rarr; Re-Render &rarr; abgeleitete Werte werden
+                automatisch aktualisiert. Kein <code>useEffect</code> n&ouml;tig!
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 5 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>Detail-Seite mit Routing</h3>
+          </div>
+          <p>
+            Jetzt f&uuml;gst du eine zweite Seite hinzu: Wenn du auf eine
+            Tier-Karte klickst, &ouml;ffnet sich die
+            <strong>Detail-Ansicht</strong> mit dem Fun Fact. Daf&uuml;r
+            brauchst du:
+          </p>
+          <ul>
+            <li>
+              Eine <code>AnimalDetail</code>-Komponente in
+              <code>src/views/AnimalDetail/AnimalDetail.tsx</code>
+            </li>
+            <li>
+              Eine <strong>dynamische Route</strong> (<code>/animal/:id</code>)
+            </li>
+            <li><code>useParams</code> um die ID aus der URL zu lesen</li>
+            <li>
+              Routing-Setup in <code>App.tsx</code> mit
+              <code>BrowserRouter</code>
+            </li>
+          </ul>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/views/AnimalDetail/AnimalDetail.tsx
+import { useParams, Link } from "react-router-dom";
+import { Animal } from "../../types";
+
+interface AnimalDetailProps {
+  animals: Animal[];
+}
+
+function AnimalDetail({ animals }: AnimalDetailProps) {
+  const { id } = useParams();
+
+  const animal = animals.find(function (a) {
+    return a.id === Number(id);
+  });
+
+  if (!animal) {
+    return (
+      &lt;div&gt;
+        &lt;p&gt;Tier nicht gefunden!&lt;/p&gt;
+        &lt;Link to="/"&gt;Zur&uuml;ck zur &Uuml;bersicht&lt;/Link&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  return (
+    &lt;div className="detail-view"&gt;
+      &lt;Link to="/"&gt;← Zur&uuml;ck&lt;/Link&gt;
+      &lt;div style={{ textAlign: "center", marginTop: "1rem" }}&gt;
+        &lt;span style={{ fontSize: "4rem" }}&gt;{animal.emoji}&lt;/span&gt;
+        &lt;h3 style={{ color: "#38bdf8", margin: "0.5rem 0" }}&gt;{animal.name}&lt;/h3&gt;
+        &lt;p&gt;Lebensraum: {animal.habitat}&lt;/p&gt;
+        {animal.dangerous ? (
+          &lt;p style={{ color: "#ef4444" }}&gt;⚠️ Dieses Tier ist gef&auml;hrlich!&lt;/p&gt;
+        ) : (
+          &lt;p style={{ color: "#22c55e" }}&gt;✅ Dieses Tier ist harmlos&lt;/p&gt;
+        )}
+        &lt;div className="fact" style={{
+          background: "#1a2744",
+          borderRadius: "8px",
+          padding: "1rem",
+          marginTop: "1rem"
+        }}&gt;
+          &lt;strong&gt;Fun Fact:&lt;/strong&gt; {animal.funFact}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default AnimalDetail;</code></pre>
+
+            <pre><code>// src/App.tsx &ndash; Routing einrichten
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./views/Home/Home";
+import AnimalDetail from "./views/AnimalDetail/AnimalDetail";
+
+const router = createBrowserRouter([
+  { path: "/", element: &lt;Home /&gt; },
+  { path: "/animal/:id", element: &lt;AnimalDetail /&gt; },
+]);
+
+function App() {
+  return &lt;RouterProvider router={router} /&gt;;
+}</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> In der <code>AnimalCard</code>-Komponente
+              musst du jetzt einen <code>&lt;Link&gt;</code> einbauen, damit bei
+              Klick zur Detail-Seite navigiert wird:
+            </div>
+
+            <pre><code>// In AnimalCard.tsx:
+import { Link } from "react-router-dom";
+
+function AnimalCard({ animal }: AnimalCardProps) {
+  return (
+    &lt;Link to={"/animal/" + animal.id}&gt;
+      &lt;div className="animal-card"&gt;
+        &lt;span&gt;{animal.emoji}&lt;/span&gt;
+        &lt;h3&gt;{animal.name}&lt;/h3&gt;
+        &lt;p&gt;{animal.habitat}&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/Link&gt;
+  );
+}</code></pre>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 6 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">6</span>
+            <h3>Layout mit Outlet</h3>
+          </div>
+          <p>
+            Zum Schluss erstellst du ein <strong>Layout</strong> mit Header und
+            Footer, das auf jeder Seite sichtbar bleibt. Nutze eine
+            <strong>Parent-Route</strong> mit <code>&lt;Outlet /&gt;</code>.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/components/Layout/Layout.tsx
+import { Outlet, Link } from "react-router-dom";
+
+function Layout() {
+  return (
+    &lt;div&gt;
+      &lt;header style={{
+        textAlign: "center",
+        padding: "1rem",
+        borderBottom: "1px solid #334155"
+      }}&gt;
+        &lt;h1 style={{ color: "#38bdf8" }}&gt;🐾 Tier-Steckbriefe&lt;/h1&gt;
+        &lt;nav&gt;
+          &lt;Link to="/" style={{ color: "#94a3b8", textDecoration: "none" }}&gt;
+            Startseite
+          &lt;/Link&gt;
+        &lt;/nav&gt;
+      &lt;/header&gt;
+
+      &lt;main style={{ maxWidth: "700px", margin: "2rem auto", padding: "0 1rem" }}&gt;
+        &lt;Outlet /&gt;
+      &lt;/main&gt;
+
+      &lt;footer style={{ textAlign: "center", color: "#475569", marginTop: "3rem" }}&gt;
+        &lt;p&gt;Tier-Steckbrief-App &copy; 2025&lt;/p&gt;
+      &lt;/footer&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default Layout;</code></pre>
+
+            <pre><code>// Angepasste App.tsx mit Layout als Parent-Route
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Layout from "./components/Layout/Layout";
+import Home from "./views/Home/Home";
+import AnimalDetail from "./views/AnimalDetail/AnimalDetail";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: &lt;Layout /&gt;,
+    children: [
+      { index: true, element: &lt;Home /&gt; },
+      { path: "animal/:id", element: &lt;AnimalDetail /&gt; },
+    ],
+  },
+]);
+
+function App() {
+  return &lt;RouterProvider router={router} /&gt;;
+}</code></pre>
+
+            <div class="call-chain">
+              <h4>Komponenten-Hierarchie:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  App &ndash; RouterProvider
+                  <div class="chain-item sub-fn">
+                    Layout &ndash; Header, &lt;Outlet /&gt;, Footer
+                    <div class="chain-item sub-fn-deep">
+                      Home (bei /) ODER AnimalDetail (bei /animal/:id)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Bonus ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Sortierung &amp; Z&auml;hler</h3>
+          </div>
+          <p>Erweitere die App um zwei Funktionen:</p>
+          <ul>
+            <li>
+              Ein <strong>Dropdown</strong> zum Sortieren der Tiere (nach Name
+              A-Z, Name Z-A)
+            </li>
+            <li>
+              Ein <strong>Z&auml;hler</strong>, der anzeigt, wie oft du einen
+              Steckbrief angesehen hast (nutze <code>useRef</code> f&uuml;r
+              einen Z&auml;hler, der <em>kein</em> Re-Render ausl&ouml;st)
+            </li>
+          </ul>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// Tipp f&uuml;r den Z&auml;hler mit useRef (in AnimalCard):
+const viewCountRef = useRef(0);
+
+function handleClick() {
+  viewCountRef.current = viewCountRef.current + 1;
+  console.log("Insgesamt angesehen:", viewCountRef.current);
+}
+
+// Im JSX: &lt;Link to={...} onClick={handleClick}&gt;
+
+// Tipp f&uuml;r die Sortierung (in Home):
+const [sortOrder, setSortOrder] = useState&lt;"az" | "za"&gt;("az");
+
+const sortedAnimals = [...filteredAnimals].sort(function (a, b) {
+  if (sortOrder === "az") {
+    return a.name.localeCompare(b.name);
+  }
+  return b.name.localeCompare(a.name);
+});</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> <code>useRef</code> hat einen wichtigen
+              Unterschied zu <code>useState</code>: Wenn du den
+              <code>.current</code>-Wert &auml;nderst, wird die Komponente
+              <strong>nicht neu gerendert</strong>. Das ist perfekt f&uuml;r
+              Z&auml;hler oder andere Werte, die du nur im Hintergrund mitlaufen
+              lassen willst.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Live-Demo ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+          <p>
+            Hier siehst du eine vereinfachte Version der fertigen App (ohne
+            echtes Routing, da wir hier im Browser arbeiten):
+          </p>
+          <div id="react-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      const animalData = [
+        {
+          id: 1,
+          name: "Roter Panda",
+          emoji: "🦊",
+          habitat: "Asien",
+          funFact: "Schläft bis zu 17 Stunden am Tag",
+          dangerous: false,
+        },
+        {
+          id: 2,
+          name: "Oktopus",
+          emoji: "🐙",
+          habitat: "Ozean",
+          funFact: "Hat drei Herzen und blaues Blut",
+          dangerous: false,
+        },
+        {
+          id: 3,
+          name: "Honigdachs",
+          emoji: "🦡",
+          habitat: "Afrika",
+          funFact: "Gilt als das furchtloseste Tier der Welt",
+          dangerous: true,
+        },
+        {
+          id: 4,
+          name: "Axolotl",
+          emoji: "🦎",
+          habitat: "Mexiko",
+          funFact: "Kann verlorene Körperteile nachwachsen lassen",
+          dangerous: false,
+        },
+        {
+          id: 5,
+          name: "Qualle",
+          emoji: "🪼",
+          habitat: "Ozean",
+          funFact: "Manche Quallen sind unsterblich",
+          dangerous: true,
+        },
+        {
+          id: 6,
+          name: "Faultier",
+          emoji: "🦥",
+          habitat: "Südamerika",
+          funFact: "Bewegt sich nur 40 Meter pro Tag",
+          dangerous: false,
+        },
+      ];
+
+      function AnimalCard({ animal, onClick }) {
+        return (
+          <div
+            className="animal-card"
+            onClick={function () {
+              onClick(animal.id);
+            }}
+          >
+            <span className="emoji">{animal.emoji}</span>
+            <p className="name">{animal.name}</p>
+            <p className="info">{animal.habitat}</p>
+            {animal.dangerous ? (
+              <p className="info" style={{ color: "#ef4444" }}>
+                ⚠️ Gefährlich!
+              </p>
+            ) : null}
+          </div>
+        );
+      }
+
+      function AnimalDetailView({ animal, onBack }) {
+        return (
+          <div className="detail-view">
+            <button className="back-btn" onClick={onBack}>
+              ← Zurück
+            </button>
+            <div style={{ textAlign: "center" }}>
+              <span style={{ fontSize: "4rem", display: "block" }}>
+                {animal.emoji}
+              </span>
+              <h3 style={{ color: "#38bdf8", margin: "0.5rem 0" }}>
+                {animal.name}
+              </h3>
+              <p>Lebensraum: {animal.habitat}</p>
+              {animal.dangerous ? (
+                <p style={{ color: "#ef4444" }}>
+                  ⚠️ Dieses Tier ist gefährlich!
+                </p>
+              ) : (
+                <p style={{ color: "#22c55e" }}>✅ Dieses Tier ist harmlos</p>
+              )}
+              <div
+                style={{
+                  background: "#1a2744",
+                  borderRadius: "8px",
+                  padding: "1rem",
+                  marginTop: "1rem",
+                }}
+              >
+                <strong>Fun Fact:</strong> {animal.funFact}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [animals, setAnimals] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [searchTerm, setSearchTerm] = useState("");
+        const [selectedId, setSelectedId] = useState(null);
+        const searchRef = useRef(null);
+
+        useEffect(function () {
+          const timer = setTimeout(function () {
+            setAnimals(animalData);
+            setLoading(false);
+          }, 1000);
+          return function () {
+            clearTimeout(timer);
+          };
+        }, []);
+
+        useEffect(
+          function () {
+            if (!loading && searchRef.current) {
+              searchRef.current.focus();
+            }
+          },
+          [loading],
+        );
+
+        const filtered = animals.filter(function (a) {
+          return a.name.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+
+        const selectedAnimal = animals.find(function (a) {
+          return a.id === selectedId;
+        });
+
+        if (loading) {
+          return (
+            <div className="loading-spinner">🔄 Lade Tier-Steckbriefe...</div>
+          );
+        }
+
+        if (selectedAnimal) {
+          return (
+            <AnimalDetailView
+              animal={selectedAnimal}
+              onBack={function () {
+                setSelectedId(null);
+              }}
+            />
+          );
+        }
+
+        return (
+          <div>
+            <h2 style={{ color: "#38bdf8", marginBottom: "1rem" }}>
+              🐾 Tier-Steckbriefe
+            </h2>
+            <div className="search-bar">
+              <input
+                ref={searchRef}
+                type="text"
+                placeholder="Tier suchen..."
+                value={searchTerm}
+                onChange={function (e) {
+                  setSearchTerm(e.target.value);
+                }}
+              />
+            </div>
+            <p style={{ color: "#94a3b8", marginBottom: "0.5rem" }}>
+              {filtered.length} Tier{filtered.length !== 1 ? "e" : ""} gefunden
+            </p>
+            <div className="animal-grid">
+              {filtered.map(function (animal) {
+                return (
+                  <AnimalCard
+                    key={animal.id}
+                    animal={animal}
+                    onClick={setSelectedId}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("react-root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>&Uuml;bung: Einkaufsliste</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- React CDN f&uuml;r Live-Demo -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      .shopping-app {
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .add-form {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .add-form input {
+        flex: 1;
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        outline: none;
+      }
+      .add-form input:focus {
+        border-color: #38bdf8;
+      }
+      .add-form select {
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 8px;
+        padding: 0.6rem;
+        color: #e2e8f0;
+        font-size: 0.9rem;
+        outline: none;
+      }
+      .shopping-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.7rem 1rem;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: opacity 0.2s;
+      }
+      .shopping-item.done {
+        opacity: 0.5;
+      }
+      .shopping-item.done .item-name {
+        text-decoration: line-through;
+      }
+      .shopping-item input[type="checkbox"] {
+        width: 1.2rem;
+        height: 1.2rem;
+        accent-color: #22c55e;
+        cursor: pointer;
+      }
+      .item-name {
+        flex: 1;
+        font-size: 0.95rem;
+      }
+      .item-category {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-weight: 600;
+      }
+      .cat-obst { background: #14532d; color: #86efac; }
+      .cat-gemuese { background: #1e3a5f; color: #7dd3fc; }
+      .cat-milch { background: #451a03; color: #fdba74; }
+      .cat-sonstiges { background: #334155; color: #94a3b8; }
+      .delete-btn {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+      .delete-btn:hover {
+        opacity: 1;
+        background: rgba(239, 68, 68, 0.1);
+      }
+      .counter {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: #94a3b8;
+      }
+      .counter span {
+        padding: 0.3rem 0.8rem;
+        background: #0f172a;
+        border-radius: 20px;
+        border: 1px solid #334155;
+      }
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: #334155;
+        border: 1px solid #475569;
+        border-radius: 50%;
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&Uuml;bung: Die Einkaufsliste</h1>
+      <p class="subtitle">
+        useContext, useReducer &amp; Material UI &ndash; State Management in der Praxis
+      </p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Aufbauende Aufgabe: Die Einkaufsliste</h2>
+        <p>
+          Du baust eine Einkaufsliste mit Kategorien. Dabei verwendest du
+          <code>useReducer</code> f&uuml;r die Listenlogik,
+          <code>useContext</code> f&uuml;r ein Theme-System und
+          <strong>MUI-Komponenten</strong> f&uuml;r das Styling.
+        </p>
+
+        <div class="hint">
+          <strong>Vorbereitung:</strong> Erstelle ein neues Vite-Projekt oder
+          nutze dein bestehendes:<br />
+          <code>npm create vite@latest einkaufsliste -- --template react-ts</code><br />
+          <code>cd einkaufsliste</code><br />
+          <code>npm install</code><br />
+          <code>npm install @mui/material @emotion/react @emotion/styled</code><br />
+          <code>npm run dev</code>
+        </div>
+
+        <!-- ======== Schritt 1 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>TypeScript-Typen f&uuml;r Items &amp; Actions</h3>
+          </div>
+          <p>
+            Definiere in <code>src/types/index.ts</code> die Typen f&uuml;r
+            ein Einkaufs-Item (mit <code>id</code>, <code>name</code>,
+            <code>category</code>, <code>done</code>) und die m&ouml;glichen
+            <strong>Aktionen</strong> (Hinzuf&uuml;gen, L&ouml;schen,
+            Umschalten). Die Kategorie soll ein fester Typ mit genau vier
+            M&ouml;glichkeiten sein.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/types/index.ts
+
+export type Category = "Obst" | "Gem&uuml;se" | "Milchprodukte" | "Sonstiges";
+
+export interface ShoppingItem {
+  id: number;
+  name: string;
+  category: Category;
+  done: boolean;
+}
+
+// Actions f&uuml;r den Reducer:
+export type ShoppingAction =
+  | { type: "ADD"; name: string; category: Category }
+  | { type: "REMOVE"; id: number }
+  | { type: "TOGGLE"; id: number };</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> <code>type Category = "Obst" | "Gem&uuml;se" | ...</code>
+              ist ein sogenannter <strong>Union Type</strong>. Er erlaubt nur
+              genau diese vier Werte &ndash; schreibst du etwas anderes, zeigt
+              TypeScript sofort einen Fehler. Das ist sicherer als
+              <code>string</code>, weil Tippfehler sofort auffallen.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 2 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Der Reducer f&uuml;r die Einkaufsliste</h3>
+          </div>
+          <p>
+            Erstelle eine Datei <code>src/reducer/shoppingReducer.ts</code>.
+            Der Reducer bekommt den aktuellen State (ein Array von Items) und
+            eine Action. Je nach Action-Typ soll er:
+          </p>
+          <ul>
+            <li><code>ADD</code>: Ein neues Item hinzuf&uuml;gen (mit automatischer ID)</li>
+            <li><code>REMOVE</code>: Ein Item anhand der ID entfernen</li>
+            <li><code>TOGGLE</code>: Den <code>done</code>-Status eines Items umschalten</li>
+          </ul>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/reducer/shoppingReducer.ts
+import { ShoppingItem, ShoppingAction } from "../types";
+
+let nextId = 1;
+
+function shoppingReducer(
+  state: ShoppingItem[],
+  action: ShoppingAction
+): ShoppingItem[] {
+
+  if (action.type === "ADD") {
+    const newItem: ShoppingItem = {
+      id: nextId,
+      name: action.name,
+      category: action.category,
+      done: false,
+    };
+    nextId = nextId + 1;
+    return [...state, newItem];
+  }
+
+  if (action.type === "REMOVE") {
+    return state.filter(function (item) {
+      return item.id !== action.id;
+    });
+  }
+
+  if (action.type === "TOGGLE") {
+    return state.map(function (item) {
+      if (item.id === action.id) {
+        return { ...item, done: !item.done };
+      }
+      return item;
+    });
+  }
+
+  return state;
+}
+
+export default shoppingReducer;</code></pre>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag callback">dispatch <small>{ type: "ADD", ... }</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag hook">Reducer <small>berechnet neuen State</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag state">[...items] <small>neues Array</small></span>
+              </div>
+              <p class="caption">
+                Jede Action beschreibt <em>was</em> passieren soll. Der Reducer entscheidet <em>wie</em>.
+              </p>
+            </div>
+
+            <div class="hint warning">
+              <strong>Wichtig:</strong> Der Reducer ver&auml;ndert den alten
+              State <strong>nie direkt</strong>! Stattdessen gibst du immer ein
+              <strong>neues Array</strong> zur&uuml;ck. Deshalb nutzen wir
+              <code>[...state, newItem]</code> statt <code>state.push(newItem)</code>,
+              und <code>state.map()</code> statt direkt
+              <code>item.done = true</code>.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 3 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>ThemeContext mit useContext</h3>
+          </div>
+          <p>
+            Erstelle einen <strong>ThemeContext</strong> in
+            <code>src/context/ThemeContext.tsx</code>. Er soll:
+          </p>
+          <ul>
+            <li>Einen State f&uuml;r das Theme haben (<code>"light"</code> oder <code>"dark"</code>)</li>
+            <li>Eine Funktion <code>toggleTheme</code> bereitstellen</li>
+            <li>Einen Provider und einen Custom Hook <code>useTheme</code> exportieren</li>
+          </ul>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/context/ThemeContext.tsx
+import { createContext, useContext, useState, ReactNode } from "react";
+
+type Theme = "light" | "dark";
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () =&gt; void;
+}
+
+const ThemeContext = createContext&lt;ThemeContextType | null&gt;(null);
+
+function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState&lt;Theme&gt;("dark");
+
+  function toggleTheme() {
+    setTheme(function (current) {
+      return current === "dark" ? "light" : "dark";
+    });
+  }
+
+  return (
+    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+      {children}
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+
+function useTheme() {
+  const context = useContext(ThemeContext);
+  if (context === null) {
+    throw new Error("useTheme muss innerhalb von ThemeProvider sein");
+  }
+  return context;
+}
+
+export { ThemeProvider, useTheme };</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> Der Custom Hook <code>useTheme()</code>
+              ist ein Wrapper um <code>useContext(ThemeContext)</code>. Das hat
+              zwei Vorteile: (1) Du musst den Context nicht in jeder Datei
+              importieren, und (2) die Fehlerpr&uuml;fung stellt sicher, dass
+              der Hook nur innerhalb des Providers verwendet wird.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 4 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>AddItemForm mit MUI-Komponenten</h3>
+          </div>
+          <p>
+            Erstelle die Komponente <code>src/components/AddItemForm/AddItemForm.tsx</code>.
+            Nutze MUI-Komponenten (<code>TextField</code>, <code>Button</code>,
+            <code>Select</code>/<code>MenuItem</code>). Die Komponente bekommt
+            eine <code>onAdd</code>-Callback-Funktion als Prop.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/components/AddItemForm/AddItemForm.tsx
+import { useState } from "react";
+import { TextField, Button, Select, MenuItem } from "@mui/material";
+import { Category } from "../../types";
+
+interface AddItemFormProps {
+  onAdd: (name: string, category: Category) =&gt; void;
+}
+
+function AddItemForm({ onAdd }: AddItemFormProps) {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState&lt;Category&gt;("Sonstiges");
+
+  function handleSubmit() {
+    if (name.trim() === "") return;  // Leere Eintr&auml;ge verhindern
+
+    onAdd(name.trim(), category);
+    setName("");  // Eingabefeld leeren
+  }
+
+  return (
+    &lt;div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}&gt;
+      &lt;TextField
+        label="Neues Item"
+        value={name}
+        onChange={function (e) { setName(e.target.value); }}
+        onKeyDown={function (e) {
+          if (e.key === "Enter") handleSubmit();
+        }}
+        size="small"
+        fullWidth
+      /&gt;
+      &lt;Select
+        value={category}
+        onChange={function (e) { setCategory(e.target.value as Category); }}
+        size="small"
+        style={{ minWidth: 140 }}
+      &gt;
+        &lt;MenuItem value="Obst"&gt;🍎 Obst&lt;/MenuItem&gt;
+        &lt;MenuItem value="Gem&uuml;se"&gt;🥦 Gem&uuml;se&lt;/MenuItem&gt;
+        &lt;MenuItem value="Milchprodukte"&gt;🧀 Milch&lt;/MenuItem&gt;
+        &lt;MenuItem value="Sonstiges"&gt;📦 Sonstiges&lt;/MenuItem&gt;
+      &lt;/Select&gt;
+      &lt;Button variant="contained" onClick={handleSubmit}&gt;
+        Hinzuf&uuml;gen
+      &lt;/Button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default AddItemForm;</code></pre>
+
+            <div class="hint">
+              <strong>Tipp:</strong> <code>onKeyDown</code> mit
+              <code>e.key === "Enter"</code> erlaubt das Hinzuf&uuml;gen per
+              Enter-Taste &ndash; eine kleine Verbesserung der
+              Benutzerfreundlichkeit.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 5 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>ShoppingItem-Komponente</h3>
+          </div>
+          <p>
+            Erstelle <code>src/components/ShoppingItem/ShoppingItem.tsx</code>.
+            Jedes Item zeigt eine <strong>Checkbox</strong> (zum Abhaken), den
+            <strong>Namen</strong>, die <strong>Kategorie</strong> als farbiges
+            Badge und einen <strong>L&ouml;schen-Button</strong>. Nutze MUI
+            <code>Checkbox</code> und <code>IconButton</code> oder einfache
+            HTML-Elemente.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/components/ShoppingItem/ShoppingItem.tsx
+import { ShoppingItem as ShoppingItemType } from "../../types";
+
+interface ShoppingItemProps {
+  item: ShoppingItemType;
+  onToggle: (id: number) =&gt; void;
+  onRemove: (id: number) =&gt; void;
+}
+
+function ShoppingItemRow({ item, onToggle, onRemove }: ShoppingItemProps) {
+  // Kategorie-Farben zuordnen
+  function getCategoryClass(category: string): string {
+    if (category === "Obst") return "cat-obst";
+    if (category === "Gem&uuml;se") return "cat-gemuese";
+    if (category === "Milchprodukte") return "cat-milch";
+    return "cat-sonstiges";
+  }
+
+  return (
+    &lt;div className={"shopping-item" + (item.done ? " done" : "")}&gt;
+      &lt;input
+        type="checkbox"
+        checked={item.done}
+        onChange={function () { onToggle(item.id); }}
+      /&gt;
+      &lt;span className="item-name"&gt;{item.name}&lt;/span&gt;
+      &lt;span className={"item-category " + getCategoryClass(item.category)}&gt;
+        {item.category}
+      &lt;/span&gt;
+      &lt;button
+        className="delete-btn"
+        onClick={function () { onRemove(item.id); }}
+      &gt;
+        ✕
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default ShoppingItemRow;</code></pre>
+
+            <div class="call-chain">
+              <h4>Callback-Kette bei Abhaken:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  App &ndash; useReducer(shoppingReducer, [])
+                  <div class="chain-item sub-fn">
+                    ShoppingItemRow &ndash; onToggle={...}
+                    <div class="chain-item sub-fn-deep">
+                      Checkbox-Klick &rarr; onToggle(item.id) &rarr; dispatch({ type: "TOGGLE", id })
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 6 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">6</span>
+            <h3>Alles zusammenbauen in App.tsx</h3>
+          </div>
+          <p>
+            Bringe alles zusammen: <code>useReducer</code> f&uuml;r die
+            Items, den <code>ThemeProvider</code> um die App herum, und die
+            Komponenten <code>AddItemForm</code> und
+            <code>ShoppingItemRow</code>. F&uuml;ge au&szlig;erdem einen
+            Z&auml;hler hinzu, der anzeigt, wie viele Items noch offen sind.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/App.tsx
+import { useReducer } from "react";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import shoppingReducer from "./reducer/shoppingReducer";
+import AddItemForm from "./components/AddItemForm/AddItemForm";
+import ShoppingItemRow from "./components/ShoppingItem/ShoppingItem";
+import { Category } from "./types";
+
+function ShoppingApp() {
+  const [items, dispatch] = useReducer(shoppingReducer, []);
+  const { theme, toggleTheme } = useTheme();
+
+  function handleAdd(name: string, category: Category) {
+    dispatch({ type: "ADD", name: name, category: category });
+  }
+
+  function handleToggle(id: number) {
+    dispatch({ type: "TOGGLE", id: id });
+  }
+
+  function handleRemove(id: number) {
+    dispatch({ type: "REMOVE", id: id });
+  }
+
+  const openCount = items.filter(function (i) { return !i.done; }).length;
+  const doneCount = items.filter(function (i) { return i.done; }).length;
+
+  return (
+    &lt;div style={{
+      maxWidth: 500,
+      margin: "2rem auto",
+      padding: "0 1rem"
+    }}&gt;
+      &lt;h1&gt;🛒 Einkaufsliste&lt;/h1&gt;
+      &lt;button onClick={toggleTheme}&gt;
+        {theme === "dark" ? "☀️" : "🌙"}
+      &lt;/button&gt;
+
+      &lt;AddItemForm onAdd={handleAdd} /&gt;
+
+      &lt;div style={{
+        display: "flex",
+        gap: "1rem",
+        marginBottom: "1rem",
+        fontSize: "0.85rem",
+        color: "#94a3b8"
+      }}&gt;
+        &lt;span&gt;📋 Offen: {openCount}&lt;/span&gt;
+        &lt;span&gt;✅ Erledigt: {doneCount}&lt;/span&gt;
+      &lt;/div&gt;
+
+      {items.length === 0 ? (
+        &lt;p style={{ textAlign: "center", color: "#64748b" }}&gt;
+          Noch keine Items. F&uuml;ge etwas hinzu!
+        &lt;/p&gt;
+      ) : (
+        items.map(function (item) {
+          return (
+            &lt;ShoppingItemRow
+              key={item.id}
+              item={item}
+              onToggle={handleToggle}
+              onRemove={handleRemove}
+            /&gt;
+          );
+        })
+      )}
+    &lt;/div&gt;
+  );
+}
+
+// App mit ThemeProvider umschlie&szlig;en
+function App() {
+  return (
+    &lt;ThemeProvider&gt;
+      &lt;ShoppingApp /&gt;
+    &lt;/ThemeProvider&gt;
+  );
+}
+
+export default App;</code></pre>
+
+            <div class="hint">
+              <strong>Beachte die Trennung:</strong> <code>ShoppingApp</code>
+              ist die eigentliche App-Logik. Sie wird von <code>App</code> in
+              den <code>ThemeProvider</code> eingewickelt. Das ist n&ouml;tig,
+              weil <code>useTheme()</code> nur <em>innerhalb</em> des Providers
+              funktioniert.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Bonus ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Filtern nach Kategorie</h3>
+          </div>
+          <p>
+            F&uuml;ge einen <strong>Kategorie-Filter</strong> hinzu: Buttons
+            f&uuml;r &bdquo;Alle&ldquo;, &bdquo;Obst&ldquo;,
+            &bdquo;Gem&uuml;se&ldquo;, &bdquo;Milchprodukte&ldquo; und
+            &bdquo;Sonstiges&ldquo;. Nur Items der gew&auml;hlten Kategorie
+            werden angezeigt. Nutze daf&uuml;r <code>useMemo</code> um die
+            Filterung effizient zu machen.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// Innerhalb von ShoppingApp erg&auml;nzen:
+import { useReducer, useState, useMemo } from "react";
+
+const [activeFilter, setActiveFilter] = useState&lt;Category | "Alle"&gt;("Alle");
+
+const filteredItems = useMemo(function () {
+  if (activeFilter === "Alle") return items;
+  return items.filter(function (item) {
+    return item.category === activeFilter;
+  });
+}, [items, activeFilter]);
+
+// Im JSX &ndash; Filter-Buttons:
+&lt;div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}&gt;
+  {["Alle", "Obst", "Gem&uuml;se", "Milchprodukte", "Sonstiges"].map(function (cat) {
+    return (
+      &lt;button
+        key={cat}
+        onClick={function () { setActiveFilter(cat as Category | "Alle"); }}
+        style={{
+          background: activeFilter === cat ? "#2563eb" : "#334155",
+          padding: "0.3rem 0.8rem",
+          fontSize: "0.85rem"
+        }}
+      &gt;
+        {cat}
+      &lt;/button&gt;
+    );
+  })}
+&lt;/div&gt;
+
+// Dann filteredItems statt items in der .map()-Schleife nutzen</code></pre>
+          </details>
+        </div>
+
+        <!-- ======== Live-Demo ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+          <p>
+            Hier siehst du eine vereinfachte Version (ohne MUI, da wir hier
+            im Browser arbeiten):
+          </p>
+          <div id="react-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script type="text/babel">
+      const { useState, useReducer, useMemo, createContext, useContext } = React;
+
+      // Einfacher Theme-Context
+      const ThemeContext = createContext(null);
+
+      function ThemeProvider({ children }) {
+        const [theme, setTheme] = useState("dark");
+        function toggleTheme() {
+          setTheme(function (c) { return c === "dark" ? "light" : "dark"; });
+        }
+        return (
+          <ThemeContext.Provider value={{ theme, toggleTheme }}>
+            {children}
+          </ThemeContext.Provider>
+        );
+      }
+
+      function useTheme() {
+        return useContext(ThemeContext);
+      }
+
+      // Reducer
+      let nextId = 1;
+      function shoppingReducer(state, action) {
+        if (action.type === "ADD") {
+          const newItem = { id: nextId, name: action.name, category: action.category, done: false };
+          nextId = nextId + 1;
+          return [...state, newItem];
+        }
+        if (action.type === "REMOVE") {
+          return state.filter(function (item) { return item.id !== action.id; });
+        }
+        if (action.type === "TOGGLE") {
+          return state.map(function (item) {
+            if (item.id === action.id) return { ...item, done: !item.done };
+            return item;
+          });
+        }
+        return state;
+      }
+
+      function getCatClass(cat) {
+        if (cat === "Obst") return "cat-obst";
+        if (cat === "Gemüse") return "cat-gemuese";
+        if (cat === "Milchprodukte") return "cat-milch";
+        return "cat-sonstiges";
+      }
+
+      function ShoppingItemRow({ item, onToggle, onRemove }) {
+        return (
+          <div className={"shopping-item" + (item.done ? " done" : "")}>
+            <input
+              type="checkbox"
+              checked={item.done}
+              onChange={function () { onToggle(item.id); }}
+            />
+            <span className="item-name">{item.name}</span>
+            <span className={"item-category " + getCatClass(item.category)}>
+              {item.category}
+            </span>
+            <button className="delete-btn" onClick={function () { onRemove(item.id); }}>
+              ✕
+            </button>
+          </div>
+        );
+      }
+
+      function AddItemForm({ onAdd }) {
+        const [name, setName] = useState("");
+        const [category, setCategory] = useState("Sonstiges");
+
+        function handleSubmit() {
+          if (name.trim() === "") return;
+          onAdd(name.trim(), category);
+          setName("");
+        }
+
+        return (
+          <div className="add-form">
+            <input
+              type="text"
+              placeholder="Neues Item..."
+              value={name}
+              onChange={function (e) { setName(e.target.value); }}
+              onKeyDown={function (e) { if (e.key === "Enter") handleSubmit(); }}
+            />
+            <select value={category} onChange={function (e) { setCategory(e.target.value); }}>
+              <option value="Obst">🍎 Obst</option>
+              <option value="Gemüse">🥦 Gemüse</option>
+              <option value="Milchprodukte">🧀 Milch</option>
+              <option value="Sonstiges">📦 Sonstiges</option>
+            </select>
+            <button onClick={handleSubmit}>+ Hinzufügen</button>
+          </div>
+        );
+      }
+
+      function ShoppingApp() {
+        const [items, dispatch] = useReducer(shoppingReducer, []);
+        const [activeFilter, setActiveFilter] = useState("Alle");
+        const { theme, toggleTheme } = useTheme();
+
+        function handleAdd(name, category) {
+          dispatch({ type: "ADD", name: name, category: category });
+        }
+
+        function handleToggle(id) {
+          dispatch({ type: "TOGGLE", id: id });
+        }
+
+        function handleRemove(id) {
+          dispatch({ type: "REMOVE", id: id });
+        }
+
+        const filteredItems = useMemo(function () {
+          if (activeFilter === "Alle") return items;
+          return items.filter(function (i) { return i.category === activeFilter; });
+        }, [items, activeFilter]);
+
+        const openCount = items.filter(function (i) { return !i.done; }).length;
+        const doneCount = items.filter(function (i) { return i.done; }).length;
+
+        const categories = ["Alle", "Obst", "Gemüse", "Milchprodukte", "Sonstiges"];
+
+        return (
+          <div className="shopping-app">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h2 style={{ color: "#38bdf8" }}>🛒 Einkaufsliste</h2>
+              <button className="theme-toggle" onClick={toggleTheme} style={{ position: "static" }}>
+                {theme === "dark" ? "☀️" : "🌙"}
+              </button>
+            </div>
+
+            <AddItemForm onAdd={handleAdd} />
+
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+              {categories.map(function (cat) {
+                return (
+                  <button
+                    key={cat}
+                    onClick={function () { setActiveFilter(cat); }}
+                    style={{
+                      background: activeFilter === cat ? "#2563eb" : "#334155",
+                      padding: "0.3rem 0.8rem",
+                      fontSize: "0.8rem",
+                      borderRadius: "20px"
+                    }}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="counter">
+              <span>📋 Offen: {openCount}</span>
+              <span>✅ Erledigt: {doneCount}</span>
+            </div>
+
+            {filteredItems.length === 0 ? (
+              <div className="empty-state">
+                {items.length === 0
+                  ? "Noch keine Items. Füge etwas hinzu!"
+                  : "Keine Items in dieser Kategorie."
+                }
+              </div>
+            ) : (
+              filteredItems.map(function (item) {
+                return (
+                  <ShoppingItemRow
+                    key={item.id}
+                    item={item}
+                    onToggle={handleToggle}
+                    onRemove={handleRemove}
+                  />
+                );
+              })
+            )}
+          </div>
+        );
+      }
+
+      function App() {
+        return (
+          <ThemeProvider>
+            <ShoppingApp />
+          </ThemeProvider>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("react-root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

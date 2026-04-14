@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Advanced</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>React Advanced</h1>
+      <p class="subtitle">
+        TypeScript, Routing, Hooks &amp; mehr &ndash; dein n&auml;chster Schritt
+      </p>
+    </header>
+
+    <main>
+      <!-- ==================== Sektion 1 ==================== -->
+      <section class="card">
+        <h2>1. TypeScript in React &ndash; Typen f&uuml;r mehr Sicherheit</h2>
+
+        <p>
+          Bisher hast du <strong>JavaScript</strong> geschrieben. Das Problem:
+          JavaScript pr&uuml;ft nicht, welche Art von Daten du &uuml;bergibst.
+          Du kannst aus Versehen eine Zahl &uuml;bergeben, wo ein Text erwartet
+          wird &ndash; und der Fehler f&auml;llt erst im Browser auf.
+        </p>
+
+        <p>
+          <strong>TypeScript</strong> ist JavaScript mit einem Extra: Es
+          pr&uuml;ft deine Datentypen <em>bevor</em> der Code l&auml;uft. Stell
+          dir vor, JavaScript ist wie ein offener Briefkasten &ndash; jeder kann
+          alles reinwerfen. TypeScript ist wie ein Briefkasten mit einem
+          <strong>Schlitz in einer bestimmten Form</strong> &ndash; nur das
+          Richtige passt rein.
+        </p>
+
+        <h3>Die wichtigsten Typen:</h3>
+
+        <pre><code>// Einfache Typen
+let name: string = "Anna";       // Text
+let age: number = 25;             // Zahl
+let isActive: boolean = true;     // Wahr/Falsch
+
+// Arrays (Listen)
+let hobbies: string[] = ["Lesen", "Kochen", "Sport"];
+let scores: number[] = [95, 87, 100];</code></pre>
+
+        <p>
+          F&uuml;r <strong>Objekte</strong> (also Daten mit mehreren
+          Eigenschaften) brauchst du einen <strong>Bauplan</strong>, der
+          beschreibt, welche Felder ein Objekt haben muss und welchen Typ jedes
+          Feld hat. Daf&uuml;r gibt es in TypeScript <strong>zwei Wege</strong>:
+          <code>interface</code> und <code>type</code>.
+        </p>
+
+        <pre><code>// Weg 1: interface &ndash; der Bauplan f&uuml;r ein Objekt
+interface User {
+  name: string;
+  age: number;
+  email: string;
+  isAdmin: boolean;
+}
+
+// Weg 2: type &ndash; kann das Gleiche
+type User = {
+  name: string;
+  age: number;
+  email: string;
+  isAdmin: boolean;
+}
+
+// Egal ob interface oder type &ndash; die Nutzung ist identisch:
+let user: User = {
+  name: "Anna",
+  age: 25,
+  email: "anna@example.com",
+  isAdmin: false
+};</code></pre>
+
+        <p>
+          Beide Varianten funktionieren f&uuml;r Objekte fast gleich. Der
+          Unterschied: <code>type</code> kann auch f&uuml;r andere Dinge genutzt
+          werden (z.B. Union Types wie
+          <code>type Status = "active" | "inactive"</code>), w&auml;hrend
+          <code>interface</code> speziell f&uuml;r die Form von Objekten gedacht
+          ist.
+        </p>
+
+        <div class="hint">
+          In den Folgenden Beispielen nutzen wir interface. Das hat aber keinen
+          technischen Grund. Die Nutzung von type ist genauso richtig und an
+          manchen Stellen benötigt, bspw. bei Union-Types von Reducern
+        </div>
+
+        <h3>TypeScript bei Props &ndash; so typisierst du Komponenten:</h3>
+
+        <pre><code>// Interface f&uuml;r die Props definieren
+interface ProfileCardProps {
+  name: string;
+  age: number;
+  city: string;
+}
+
+// Props mit dem Interface typisieren
+function ProfileCard({ name, age, city }: ProfileCardProps) {
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;{name}&lt;/h2&gt;
+      &lt;p&gt;Alter: {age}&lt;/p&gt;
+      &lt;p&gt;Stadt: {city}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// TypeScript warnt, wenn du etwas Falsches &uuml;bergibst:
+&lt;ProfileCard name="Anna" age={25} city="Berlin" /&gt;  // OK
+&lt;ProfileCard name="Anna" age="25" city="Berlin" /&gt;  // FEHLER! age muss eine Zahl sein</code></pre>
+
+        <h3>Falsch:</h3>
+        <pre
+          class="wrong"
+        ><code>// Ohne Typen: Kein Fehler beim Schreiben, Absturz im Browser
+function ProfileCard({ name, age, city }) {
+  return &lt;p&gt;{name} ist {age.toFixed(0)} Jahre alt&lt;/p&gt;;
+}
+
+// age ist aus Versehen ein String:
+&lt;ProfileCard name="Anna" age="f&uuml;nfundzwanzig" city="Berlin" /&gt;
+// Absturz: "f&uuml;nfundzwanzig".toFixed is not a function</code></pre>
+
+        <h3>Richtig:</h3>
+        <pre
+          class="right"
+        ><code>// Mit Typen: TypeScript erkennt den Fehler SOFORT
+interface ProfileCardProps {
+  name: string;
+  age: number;    // &lt;-- muss eine Zahl sein
+  city: string;
+}
+
+function ProfileCard({ name, age, city }: ProfileCardProps) {
+  return &lt;p&gt;{name} ist {age.toFixed(0)} Jahre alt&lt;/p&gt;;
+}
+
+// TypeScript zeigt sofort einen roten Fehler:
+// "Type 'string' is not assignable to type 'number'"</code></pre>
+
+        <h3>useState mit TypeScript:</h3>
+
+        <pre><code>// TypeScript erkennt den Typ oft automatisch:
+const [count, setCount] = useState(0);        // count ist automatisch 'number'
+const [name, setName] = useState("Anna");     // name ist automatisch 'string'
+
+// Bei komplexen Typen gibst du ihn explizit an:
+interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
+
+const [todos, setTodos] = useState&lt;Todo[]&gt;([]);  // Array von Todo-Objekten
+const [user, setUser] = useState&lt;User | null&gt;(null);  // User oder null</code></pre>
+
+        <div class="hint">
+          <strong>Merke:</strong> TypeScript-Dateien enden auf
+          <code>.tsx</code> (statt <code>.jsx</code>) bzw.
+          <code>.ts</code> (statt <code>.js</code>). Interfaces definieren die
+          <strong>Form</strong> deiner Daten. Bei <code>useState</code> kannst
+          du den Typ in spitzen Klammern angeben:
+          <code>useState&lt;Typ&gt;(startwert)</code>.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 2 ==================== -->
+      <section class="card">
+        <h2>2. Vite &ndash; dein schnelles Build-Tool</h2>
+        <h3>Was Vite erstellt &ndash; die Standardstruktur:</h3>
+
+        <div class="folder-tree">
+          <span class="folder">mein-projekt/</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="folder">public/</span>
+          <span class="comment">&larr; Statische Dateien (Bilder etc.)</span
+          ><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="folder">src/</span>
+          <span class="comment">&larr; Dein gesamter Code lebt hier</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span>
+          <span class="file-ts">App.tsx</span>
+          <span class="comment">&larr; Deine Hauptkomponente</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span>
+          <span class="file-css">App.css</span>
+          <span class="comment">&larr; Styling f&uuml;r App</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span>
+          <span class="file-ts">main.tsx</span>
+          <span class="comment">&larr; Einstiegspunkt (render)</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span>
+          <span class="file-css">index.css</span>
+          <span class="comment">&larr; Globale Styles</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="file">index.html</span>
+          <span class="comment">&larr; Die einzige HTML-Datei</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="file">package.json</span>
+          <span class="comment"
+            >&larr; Projektinfos &amp; Abh&auml;ngigkeiten</span
+          ><br />
+          <span class="tree-line">&boxur;&boxh;&boxh;</span>
+          <span class="file">tsconfig.json</span>
+          <span class="comment">&larr; TypeScript-Konfiguration</span>
+        </div>
+
+        <p>
+          Die wichtigste Datei ist <code>main.tsx</code> &ndash; sie rendert
+          deine <code>App</code>-Komponente in den Browser:
+        </p>
+
+        <pre><code>// main.tsx &ndash; der Einstiegspunkt
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  &lt;React.StrictMode&gt;
+    &lt;App /&gt;
+  &lt;/React.StrictMode&gt;
+);</code></pre>
+
+        <div class="hint">
+          <strong>Merke:</strong> Vite erstellt mit
+          <code>--template react-ts</code> direkt ein TypeScript-Projekt. Der
+          Befehl <code>npm run dev</code> startet den Entwicklungsserver,
+          <code>npm run build</code> erstellt die fertige Website f&uuml;r die
+          Ver&ouml;ffentlichung.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 3 ==================== -->
+      <section class="card">
+        <h2>3. Ordnerstruktur &ndash; Ordnung im Projekt</h2>
+
+        <p>
+          Wenn dein Projekt w&auml;chst, brauchst du eine klare
+          <strong>Ordnerstruktur</strong>. Ohne Ordnung findest du nichts mehr
+          wieder &ndash; wie ein Kleiderschrank, in dem alles auf einem Haufen
+          liegt.
+        </p>
+
+        <p>
+          Die Grundidee: <strong>Jede Datei hat ihren Platz</strong>. Wir
+          trennen zwischen <strong>Seiten</strong> (Views),
+          <strong>wiederverwendbaren Bausteinen</strong> (Components) und
+          <strong>Logik</strong> (Hooks, Context, Types).
+        </p>
+
+        <h3>Empfohlene Struktur:</h3>
+
+        <div class="folder-tree">
+          <span class="folder">src/</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="folder">components/</span>
+          <span class="comment">&larr; Wiederverwendbare UI-Bausteine</span
+          ><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span>
+          <span class="folder">Button/</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span
+          >
+          <span class="file-ts">Button.tsx</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span
+          >
+          <span class="file-css">Button.css</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span>
+          <span class="folder">Header/</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span
+          >
+          <span class="file-ts">Header.tsx</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span
+          >
+          <span class="file-css">Header.css</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span>
+          <span class="folder">Card/</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &boxvr;&boxh;&boxh;</span
+          >
+          <span class="file-ts">Card.tsx</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &boxur;&boxh;&boxh;</span
+          >
+          <span class="file-css">Card.css</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="folder">views/</span>
+          <span class="comment">&larr; Seitenansichten (eine pro Route)</span
+          ><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span>
+          <span class="folder">Home/</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span
+          >
+          <span class="file-ts">Home.tsx</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span
+          >
+          <span class="file-css">Home.css</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span
+          >
+          <span class="folder">components/</span>
+          <span class="comment">&larr; Subkomponenten nur f&uuml;r Home</span
+          ><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &boxur;&boxh;&boxh;</span
+          >
+          <span class="file-ts">HeroSection.tsx</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span>
+          <span class="folder">Profile/</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span
+          >
+          <span class="file-ts">Profile.tsx</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span>
+          <span class="folder">Settings/</span><br />
+          <span class="tree-line"
+            >&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &boxur;&boxh;&boxh;</span
+          >
+          <span class="file-ts">Settings.tsx</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="folder">hooks/</span>
+          <span class="comment">&larr; Eigene Custom Hooks</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span>
+          <span class="file-ts">useLocalStorage.ts</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="folder">context/</span>
+          <span class="comment">&larr; Context Provider</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span>
+          <span class="file-ts">ThemeContext.tsx</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="folder">types/</span>
+          <span class="comment">&larr; Gemeinsame TypeScript-Typen</span><br />
+          <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span>
+          <span class="file-ts">index.ts</span><br />
+          <span class="tree-line">&boxvr;&boxh;&boxh;</span>
+          <span class="file-ts">App.tsx</span>
+          <span class="comment">&larr; Hauptkomponente mit Router</span><br />
+          <span class="tree-line">&boxur;&boxh;&boxh;</span>
+          <span class="file-ts">main.tsx</span>
+          <span class="comment">&larr; Einstiegspunkt</span>
+        </div>
+
+        <h3>Die wichtigsten Regeln:</h3>
+
+        <ul>
+          <li>
+            <strong>components/</strong> &ndash; Bausteine, die auf
+            <em>mehreren</em> Seiten verwendet werden (Button, Header, Card).
+            Jede Komponente bekommt einen eigenen Ordner mit
+            <code>.tsx</code> und <code>.css</code>.
+          </li>
+          <li>
+            <strong>views/</strong> &ndash; Eine View pro Seite/Route. Wenn eine
+            View eine Unterkomponente hat, die <em>nur</em> dort benutzt wird,
+            kommt sie in einen <code>components/</code>-Unterordner innerhalb
+            der View.
+          </li>
+          <li>
+            <strong>hooks/</strong> &ndash; Eigene Hooks (Funktionen, die mit
+            <code>use</code> beginnen) geh&ouml;ren hierher.
+          </li>
+          <li>
+            <strong>context/</strong> &ndash; Globaler State mit
+            <code>useContext</code> wird hier definiert.
+          </li>
+          <li>
+            <strong>types/</strong> &ndash; TypeScript-Interfaces, die in
+            mehreren Dateien gebraucht werden.
+          </li>
+        </ul>
+
+        <div class="hint">
+          <strong>Merke:</strong> Die Faustregel ist einfach &ndash; wird eine
+          Komponente an <strong>mehreren Stellen</strong> genutzt, kommt sie in
+          <code>components/</code>. Wird sie nur auf
+          <strong>einer Seite</strong> genutzt, kommt sie in den
+          <code>components/</code>-Unterordner dieser View. Jeder Ordner hat
+          einen klaren Zweck.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 4 ==================== -->
+      <section class="card">
+        <h2>
+          4. Wichtige Hooks &ndash; useEffect, useRef, useMemo &amp; Custom
+          Hooks
+        </h2>
+
+        <p>
+          Du kennst schon <code>useState</code>. Jetzt lernst du vier weitere
+          Werkzeuge kennen, die dir in fast jedem Projekt begegnen werden.
+        </p>
+
+        <h3>useEffect &ndash; Seiteneffekte ausf&uuml;hren</h3>
+
+        <p>
+          <code>useEffect</code> ist wie ein <strong>Auftrag</strong>, den du
+          React gibst: &bdquo;Wenn sich etwas &auml;ndert, f&uuml;hre diesen
+          Code aus.&ldquo; Das brauchst du z.B. f&uuml;r:
+        </p>
+
+        <ul>
+          <li>Daten von einer API laden</li>
+          <li>Den Seiten-Titel &auml;ndern</li>
+          <li>Einen Timer starten</li>
+          <li>Auf &Auml;nderungen reagieren</li>
+        </ul>
+
+        <pre><code>import { useState, useEffect } from "react";
+
+function UserProfile({ userId }: { userId: number }) {
+  const [user, setUser] = useState&lt;User | null&gt;(null);
+
+  // Wird ausgef&uuml;hrt wenn die Komponente erscheint
+  // UND wenn sich userId &auml;ndert
+  useEffect(function () {
+    console.log("Lade Daten f&uuml;r User", userId);
+
+    fetch("/api/users/" + userId)
+      .then(function (response) { return response.json(); })
+      .then(function (data) { setUser(data); });
+  }, [userId]);
+  //  ^^^^^^^^ Abh&auml;ngigkeits-Array: Nur neu ausf&uuml;hren wenn userId sich &auml;ndert
+
+  if (user === null) {
+    return &lt;p&gt;Laden...&lt;/p&gt;;
+  }
+
+  return &lt;h1&gt;{user.name}&lt;/h1&gt;;
+}</code></pre>
+
+        <div class="visual">
+          <div class="flow">
+            <span class="tag hook">useEffect <small>Funktion</small></span>
+            <span class="arrow">+</span>
+            <span class="tag type"
+              >[userId] <small>Abh&auml;ngigkeit</small></span
+            >
+            <span class="arrow">=</span>
+            <span class="tag callback"
+              >Ausf&uuml;hren <small>bei &Auml;nderung</small></span
+            >
+          </div>
+          <p class="caption">
+            Das Array am Ende bestimmt, <em>wann</em> der Effekt ausgef&uuml;hrt
+            wird.
+          </p>
+        </div>
+
+        <p>
+          Das <strong>Abh&auml;ngigkeits-Array</strong> (der zweite Parameter)
+          ist entscheidend:
+        </p>
+
+        <pre><code>// Variante 1: Leeres Array &ndash; nur EINMAL beim ersten Anzeigen
+useEffect(function () {
+  console.log("Komponente wurde geladen");
+}, []);
+
+// Variante 2: Mit Werten &ndash; bei JEDER &Auml;nderung dieser Werte
+useEffect(function () {
+  console.log("Name oder Alter hat sich ge&auml;ndert");
+}, [name, age]);
+
+// Variante 3: KEIN Array &ndash; bei JEDEM Rendern (selten n&ouml;tig!)
+useEffect(function () {
+  console.log("Komponente wurde neu gerendert");
+});</code></pre>
+
+        <div class="hint warning">
+          <strong>Achtung:</strong> Vergiss nie das Abh&auml;ngigkeits-Array!
+          Ohne Array wird der Effekt bei <em>jedem</em> Rendern ausgef&uuml;hrt
+          &ndash; das kann zu Endlosschleifen f&uuml;hren, besonders wenn du im
+          Effekt <code>setState</code> aufrufst.
+        </div>
+
+        <h3>useRef &ndash; Auf HTML-Elemente zugreifen</h3>
+
+        <p>
+          <code>useRef</code> erstellt eine <strong>Referenz</strong> &ndash;
+          wie ein Zeigefinger, der auf ein bestimmtes Element auf der Seite
+          zeigt. Damit kannst du z.B. ein Eingabefeld fokussieren oder die
+          H&ouml;he eines Elements auslesen.
+        </p>
+
+        <pre><code>import { useRef } from "react";
+
+function SearchBar() {
+  const inputRef = useRef&lt;HTMLInputElement&gt;(null);
+  //                      ^^^^^^^^^^^^^^^^ Typ des Elements
+
+  function handleButtonClick() {
+    // Direkt auf das Input-Element zugreifen:
+    inputRef.current?.focus();
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;input ref={inputRef} type="text" placeholder="Suchen..." /&gt;
+      &lt;button onClick={handleButtonClick}&gt;Fokussieren&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <h3>useMemo &ndash; Berechnungen zwischenspeichern</h3>
+
+        <p>
+          <code>useMemo</code> merkt sich das Ergebnis einer Berechnung und
+          f&uuml;hrt sie nur dann erneut aus, wenn sich die Eingangswerte
+          &auml;ndern. Das ist wie ein
+          <strong>Taschenrechner mit Speicher</strong> &ndash; wenn du die
+          gleiche Aufgabe nochmal eingibst, zeigt er sofort das gespeicherte
+          Ergebnis.
+        </p>
+
+        <pre><code>import { useState, useMemo } from "react";
+
+function ProductList({ products }: { products: Product[] }) {
+  const [filter, setFilter] = useState("");
+
+  // Wird nur neu berechnet wenn products oder filter sich &auml;ndern
+  const filteredProducts = useMemo(function () {
+    console.log("Filtere Produkte...");
+    return products.filter(function (p) {
+      return p.name.toLowerCase().includes(filter.toLowerCase());
+    });
+  }, [products, filter]);
+
+  return (
+    &lt;div&gt;
+      &lt;input value={filter} onChange={function (e) { setFilter(e.target.value); }} /&gt;
+      &lt;p&gt;{filteredProducts.length} Produkte gefunden&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <h3>Custom Hooks &ndash; Eigene Logik auslagern</h3>
+
+        <p>
+          Wenn du die gleiche Logik in mehreren Komponenten brauchst, kannst du
+          einen <strong>eigenen Hook</strong> erstellen. Die Regel: Der Name
+          muss mit <code>use</code> beginnen.
+        </p>
+
+        <pre><code>// hooks/useFormInput.ts
+import { useState } from "react";
+
+// Dieser Hook b&uuml;ndelt alles, was ein Eingabefeld braucht:
+// den aktuellen Wert, eine onChange-Funktion und eine Reset-Funktion.
+function useFormInput(initialValue: string) {
+  const [value, setValue] = useState(initialValue);
+
+  // Diese Funktion wird direkt an onChange &uuml;bergeben
+  function handleChange(event: React.ChangeEvent&lt;HTMLInputElement&gt;) {
+    setValue(event.target.value);
+  }
+
+  // Setzt das Feld auf den Startwert zur&uuml;ck
+  function reset() {
+    setValue(initialValue);
+  }
+
+  return { value, onChange: handleChange, reset };
+}
+
+export default useFormInput;
+
+// Nutzung in einer Komponente:
+function ContactForm() {
+  const nameInput = useFormInput("");
+  const emailInput = useFormInput("");
+
+  function handleSubmit() {
+    console.log("Name:", nameInput.value, "Email:", emailInput.value);
+    nameInput.reset();   // Felder leeren
+    emailInput.reset();
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;input type="text" placeholder="Name" value={nameInput.value} onChange={nameInput.onChange} /&gt;
+      &lt;input type="email" placeholder="Email" value={emailInput.value} onChange={emailInput.onChange} /&gt;
+      &lt;button onClick={handleSubmit}&gt;Absenden&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <div class="hint">
+          <strong>Merke:</strong> <code>useEffect</code> f&uuml;hrt Code nach
+          dem Rendern aus (Daten laden, Timer etc.). <code>useRef</code> zeigt
+          direkt auf ein HTML-Element. <code>useMemo</code> speichert
+          Berechnungsergebnisse. <strong>Custom Hooks</strong> b&uuml;ndeln
+          wiederverwendbare Logik in einer Funktion, die mit
+          <code>use</code> beginnt.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 5 ==================== -->
+      <section class="card">
+        <h2>5. React Router &ndash; Mehrere Seiten in einer App</h2>
+
+        <p>
+          Eine normale Website hat mehrere Seiten (<code>/home</code>,
+          <code>/about</code>, <code>/profile</code>). Jede URL zeigt andere
+          Inhalte. <strong>React Router</strong> macht das m&ouml;glich &ndash;
+          ohne die Seite jedes Mal komplett neu zu laden.
+        </p>
+
+        <p>
+          Stell dir einen <strong>Bilderrahmen</strong> vor: Der Rahmen (die
+          Navigation, der Header, der Footer) bleibt immer gleich. Nur das
+          <strong>Bild im Rahmen</strong> wechselt &ndash; je nachdem, welche
+          URL du aufrufst.
+        </p>
+
+        <h3>Installation:</h3>
+
+        <pre><code>npm install react-router-dom</code></pre>
+
+        <h3>Grundlegende Einrichtung:</h3>
+
+        <pre><code>// App.tsx
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./views/Home/Home";
+import About from "./views/About/About";
+import Profile from "./views/Profile/Profile";
+
+// Router wird au&szlig;erhalb der Komponente erstellt
+const router = createBrowserRouter([
+  { path: "/", element: &lt;Home /&gt; },
+  { path: "/about", element: &lt;About /&gt; },
+  { path: "/profile", element: &lt;Profile /&gt; },
+]);
+
+function App() {
+  return &lt;RouterProvider router={router} /&gt;;
+}</code></pre>
+
+        <h3>Navigation mit Link:</h3>
+
+        <pre><code>import { Link } from "react-router-dom";
+
+function Navigation() {
+  return (
+    &lt;nav&gt;
+      &lt;Link to="/"&gt;Home&lt;/Link&gt;
+      &lt;Link to="/about"&gt;&Uuml;ber uns&lt;/Link&gt;
+      &lt;Link to="/profile"&gt;Profil&lt;/Link&gt;
+    &lt;/nav&gt;
+  );
+}</code></pre>
+
+        <div class="hint warning">
+          <strong>Achtung:</strong> Nutze immer <code>&lt;Link&gt;</code> statt
+          <code>&lt;a href="..."&gt;</code>! Ein normaler Link l&auml;dt die
+          ganze Seite neu. <code>&lt;Link&gt;</code> wechselt nur den Inhalt
+          &ndash; viel schneller!
+        </div>
+
+        <h3>Parent/Child Routes &amp; Outlet:</h3>
+
+        <p>
+          Oft m&ouml;chtest du ein <strong>Layout</strong> (Header, Footer,
+          Seitenleiste), das auf jeder Seite gleich bleibt. Daf&uuml;r gibt es
+          <strong>verschachtelte Routen</strong>:
+        </p>
+
+        <pre><code>// Layout-Komponente mit Outlet
+import { Outlet, Link } from "react-router-dom";
+
+function Layout() {
+  return (
+    &lt;div&gt;
+      &lt;header&gt;
+        &lt;nav&gt;
+          &lt;Link to="/"&gt;Home&lt;/Link&gt;
+          &lt;Link to="/about"&gt;&Uuml;ber uns&lt;/Link&gt;
+        &lt;/nav&gt;
+      &lt;/header&gt;
+
+      &lt;main&gt;
+        &lt;Outlet /&gt;  {/* Hier wird die aktuelle Seite eingesetzt */}
+      &lt;/main&gt;
+
+      &lt;footer&gt;
+        &lt;p&gt;Meine App &copy; 2025&lt;/p&gt;
+      &lt;/footer&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Verschachtelte Routen in App.tsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: &lt;Layout /&gt;,        // Parent
+    children: [
+      { index: true, element: &lt;Home /&gt; },          // Index-Route: "/"
+      { path: "about", element: &lt;About /&gt; },        // Child: "/about"
+      { path: "profile", element: &lt;Profile /&gt; },    // Child: "/profile"
+    ],
+  },
+]);
+
+function App() {
+  return &lt;RouterProvider router={router} /&gt;;
+}</code></pre>
+
+        <div class="route-tree">
+          <div class="route-box layout">
+            <span class="label">Parent: Layout</span>
+            <code>&lt;Route path="/" element={&lt;Layout /&gt;}&gt;</code>
+            <div class="route-box index">
+              <span class="label">Index-Route</span>
+              <code>&lt;Route index element={&lt;Home /&gt;} /&gt;</code> &rarr;
+              URL: <code>/</code>
+            </div>
+            <div class="route-box page">
+              <span class="label">Child-Route</span>
+              <code
+                >&lt;Route path="about" element={&lt;About /&gt;} /&gt;</code
+              >
+              &rarr; URL: <code>/about</code>
+            </div>
+            <div class="route-box page">
+              <span class="label">Child-Route</span>
+              <code
+                >&lt;Route path="profile" element={&lt;Profile /&gt;}
+                /&gt;</code
+              >
+              &rarr; URL: <code>/profile</code>
+            </div>
+          </div>
+        </div>
+
+        <h3>Dynamische Routen &ndash; Variable URLs:</h3>
+
+        <p>
+          Manchmal ist ein Teil der URL <strong>variabel</strong> &ndash; z.B.
+          <code>/user/1</code>, <code>/user/2</code>, <code>/user/42</code>.
+          Daf&uuml;r nutzt du einen <strong>Doppelpunkt</strong> als
+          Platzhalter:
+        </p>
+
+        <pre><code>// Route mit Parameter:
+&lt;Route path="/user/:userId" element={&lt;UserDetail /&gt;} /&gt;
+
+// In der Komponente den Parameter auslesen:
+import { useParams } from "react-router-dom";
+
+function UserDetail() {
+  const { userId } = useParams();
+  // Bei URL /user/42 ist userId = "42"
+
+  return &lt;h1&gt;Profil von User {userId}&lt;/h1&gt;;
+}</code></pre>
+
+        <div class="hint">
+          <strong>Merke:</strong> <code>&lt;Outlet /&gt;</code> ist der
+          Platzhalter im Layout, wo die Kind-Seite eingesetzt wird.
+          <code>index</code> markiert die Standard-Route eines Parents.
+          <code>:parameter</code> in der URL macht sie dynamisch &ndash;
+          <code>useParams()</code> liest den Wert aus.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 6 ==================== -->
+      <section class="card">
+        <h2>6. State Management &ndash; useContext &amp; useReducer</h2>
+
+        <p>
+          Du kennst <code>useState</code> f&uuml;r State in einer einzelnen
+          Komponente. Aber was, wenn <strong>mehrere Komponenten</strong> auf
+          die gleichen Daten zugreifen m&uuml;ssen? Oder wenn dein State
+          <strong>komplex</strong> wird?
+        </p>
+
+        <h3>Das Problem: Prop Drilling</h3>
+
+        <p>
+          Ohne L&ouml;sung musst du Daten durch viele Ebenen weitergeben &ndash;
+          das nennt man <strong>Prop Drilling</strong> (wie ein Bohrer durch
+          Schichten). Das wird schnell un&uuml;bersichtlich:
+        </p>
+
+        <pre
+          class="wrong"
+        ><code>// Prop Drilling: App &rarr; Layout &rarr; Header &rarr; UserInfo
+// Jede Komponente muss user weiterreichen, obwohl nur UserInfo ihn braucht!
+function App() {
+  const [user, setUser] = useState(currentUser);
+  return &lt;Layout user={user} /&gt;;
+}
+function Layout({ user }) {
+  return &lt;Header user={user} /&gt;;
+}
+function Header({ user }) {
+  return &lt;UserInfo user={user} /&gt;;
+}</code></pre>
+
+        <h3>useContext &ndash; Daten global verf&uuml;gbar machen</h3>
+
+        <p>
+          <code>useContext</code> ist wie ein <strong>Schwarzes Brett</strong>
+          im B&uuml;ro: Du h&auml;ngst Informationen dran, und jeder kann sie
+          lesen &ndash; ohne dass sie von Person zu Person weitergereicht
+          werden.
+        </p>
+
+        <pre><code>// 1. Context erstellen (context/ThemeContext.tsx)
+import { createContext } from "react";
+
+// Context erstellen mit einem Standardwert
+export const ThemeContext = createContext&lt;{
+  theme: string;
+  toggleTheme: () =&gt; void;
+}&gt;({
+  theme: "hell",
+  toggleTheme: function () {},  // Leere Funktion als Platzhalter
+});</code></pre>
+
+        <pre><code>// 2. Provider direkt in App.tsx einbinden
+import { useState } from "react";
+import { ThemeContext } from "./context/ThemeContext";
+
+function App() {
+  const [theme, setTheme] = useState("hell");
+
+  function toggleTheme() {
+    if (theme === "hell") {
+      setTheme("dunkel");
+    } else {
+      setTheme("hell");
+    }
+  }
+
+  return (
+    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+      &lt;RouterProvider router={router} /&gt;
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+
+// 3. In JEDER Komponente darauf zugreifen &ndash; ohne Prop Drilling!
+import { useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
+
+function ThemeButton() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
+  return (
+    &lt;button onClick={toggleTheme}&gt;
+      Aktuell: {theme} &ndash; Klick zum Wechseln!
+    &lt;/button&gt;
+  );
+}</code></pre>
+
+        <div class="visual">
+          <div class="flow">
+            <span class="tag context"
+              >ThemeContext.Provider <small>stellt Daten bereit</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag hook"
+              >useContext() <small>greift darauf zu</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag jsx">{theme} <small>im JSX</small></span>
+          </div>
+          <p class="caption">
+            Der Provider umschlie&szlig;t die App. Jede Komponente darunter kann
+            mit <code>useContext(ThemeContext)</code> auf die Daten zugreifen
+            &ndash; egal wie tief verschachtelt.
+          </p>
+        </div>
+
+        <h3>useReducer &ndash; Komplexen State verwalten</h3>
+
+        <p>
+          <code>useReducer</code> ist wie <code>useState</code>, aber f&uuml;r
+          <strong>kompliziertere F&auml;lle</strong>. Stell dir eine
+          <strong>Poststelle</strong> vor: Du schickst einen Auftrag
+          (<strong>Action</strong>) ab, und die Poststelle (der
+          <strong>Reducer</strong>) entscheidet, was damit passiert.
+        </p>
+
+        <pre><code>import { useReducer } from "react";
+
+// 1. Typen definieren
+interface State {
+  count: number;
+}
+
+type Action =
+  | { type: "INCREMENT" }
+  | { type: "DECREMENT" }
+  | { type: "RESET" };
+
+// 2. Reducer-Funktion: Bekommt alten State + Action, gibt neuen State zur&uuml;ck
+function counterReducer(state: State, action: Action): State {
+  if (action.type === "INCREMENT") {
+    return { count: state.count + 1 };
+  }
+  if (action.type === "DECREMENT") {
+    return { count: state.count - 1 };
+  }
+  if (action.type === "RESET") {
+    return { count: 0 };
+  }
+  return state;
+}
+
+// 3. In der Komponente verwenden
+function Counter() {
+  const [state, dispatch] = useReducer(counterReducer, { count: 0 });
+  //     ^^^^^  ^^^^^^^^                                 ^^^^^^^^^^
+  //     State  Funktion zum Senden                      Startwert
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Z&auml;hler: {state.count}&lt;/p&gt;
+      &lt;button onClick={function () { dispatch({ type: "INCREMENT" }); }}&gt;+1&lt;/button&gt;
+      &lt;button onClick={function () { dispatch({ type: "DECREMENT" }); }}&gt;-1&lt;/button&gt;
+      &lt;button onClick={function () { dispatch({ type: "RESET" }); }}&gt;Reset&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <div class="visual">
+          <div class="flow">
+            <span class="tag callback"
+              >dispatch <small>{ type: "INCREMENT" }</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag hook"
+              >Reducer <small>berechnet neuen State</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag state">state <small>{ count: 1 }</small></span>
+          </div>
+          <p class="caption">
+            <code>dispatch</code> sendet eine Action an den Reducer. Der Reducer
+            gibt den neuen State zur&uuml;ck.
+          </p>
+        </div>
+
+        <div class="hint">
+          <strong>Merke:</strong> <code>useContext</code> macht Daten
+          <strong>global</strong> verf&uuml;gbar (kein Prop Drilling mehr).
+          <code>useReducer</code> eignet sich f&uuml;r
+          <strong>komplexen State</strong> mit vielen verschiedenen Aktionen.
+          Oft werden beide kombiniert: Context stellt Daten bereit, Reducer
+          verwaltet die Logik.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 7 ==================== -->
+      <section class="card">
+        <h2>7. Externe Packages &ndash; Axios &amp; Material UI</h2>
+
+        <p>
+          Du musst nicht alles selbst bauen! Die JavaScript-Welt hat
+          <strong>tausende Pakete</strong> (Packages), die du mit
+          <code>npm install</code> installieren kannst. Zwei besonders
+          n&uuml;tzliche:
+        </p>
+
+        <h3>Axios &ndash; Daten von APIs laden</h3>
+
+        <p>
+          <strong>Axios</strong> ist eine Bibliothek f&uuml;r
+          <strong>HTTP-Anfragen</strong> (Daten aus dem Internet holen). Du
+          kannst auch <code>fetch</code> benutzen, aber Axios macht einiges
+          einfacher: automatische JSON-Umwandlung, bessere Fehlerbehandlung und
+          die M&ouml;glichkeit, Standardwerte zu setzen.
+        </p>
+
+        <pre><code># Installation:
+npm install axios</code></pre>
+
+        <pre><code>import axios from "axios";
+import { useState, useEffect } from "react";
+
+interface Post {
+  id: number;
+  title: string;
+  body: string;
+}
+
+function PostList() {
+  const [posts, setPosts] = useState&lt;Post[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(function () {
+    axios.get&lt;Post[]&gt;("https://jsonplaceholder.typicode.com/posts")
+      .then(function (response) {
+        setPosts(response.data);  // Axios packt die Daten automatisch in .data
+        setLoading(false);
+      })
+      .catch(function (err) {
+        setError("Fehler beim Laden: " + err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return &lt;p&gt;Laden...&lt;/p&gt;;
+  if (error) return &lt;p&gt;{error}&lt;/p&gt;;
+
+  return (
+    &lt;ul&gt;
+      {posts.map(function (post) {
+        return &lt;li key={post.id}&gt;{post.title}&lt;/li&gt;;
+      })}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+
+        <div class="visual">
+          <div class="flow">
+            <span class="tag hook">useEffect <small>beim Laden</small></span>
+            <span class="arrow">&rarr;</span>
+            <span class="tag callback"
+              >axios.get() <small>API-Anfrage</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag state"
+              >setPosts() <small>Daten speichern</small></span
+            >
+            <span class="arrow">&rarr;</span>
+            <span class="tag jsx"
+              >posts.map() <small>Liste anzeigen</small></span
+            >
+          </div>
+          <p class="caption">
+            Typisches Muster: Daten laden, in State speichern, im JSX anzeigen.
+          </p>
+        </div>
+
+        <h3>Material UI (MUI) &ndash; Fertige Komponenten</h3>
+
+        <p>
+          <strong>MUI</strong> ist eine Sammlung von
+          <strong>fertigen, sch&ouml;nen Komponenten</strong> &ndash; Buttons,
+          Textfelder, Karten, Dialoge und vieles mehr. Statt alles selbst zu
+          stylen, importierst du einfach die passende Komponente.
+        </p>
+
+        <pre><code># Installation:
+npm install @mui/material @emotion/react @emotion/styled</code></pre>
+
+        <pre><code>import { Button, TextField, Card, CardContent, Typography } from "@mui/material";
+import { useState } from "react";
+
+function ContactForm() {
+  const [name, setName] = useState("");
+
+  return (
+    &lt;Card sx={{ maxWidth: 400, padding: 2 }}&gt;
+      &lt;CardContent&gt;
+        &lt;Typography variant="h5"&gt;Kontaktformular&lt;/Typography&gt;
+        &lt;TextField
+          label="Dein Name"
+          value={name}
+          onChange={function (e) { setName(e.target.value); }}
+          fullWidth
+          margin="normal"
+        /&gt;
+        &lt;Button variant="contained" color="primary"&gt;
+          Absenden
+        &lt;/Button&gt;
+      &lt;/CardContent&gt;
+    &lt;/Card&gt;
+  );
+}</code></pre>
+
+        <p>Die wichtigsten MUI-Komponenten f&uuml;r den Anfang:</p>
+
+        <ul>
+          <li>
+            <code>Button</code> &ndash; Klickbare Buttons (variant:
+            &bdquo;contained&ldquo;, &bdquo;outlined&ldquo;, &bdquo;text&ldquo;)
+          </li>
+          <li>
+            <code>TextField</code> &ndash; Eingabefelder mit Label und
+            Validierung
+          </li>
+          <li>
+            <code>Card</code> / <code>CardContent</code> &ndash;
+            Karten-Container
+          </li>
+          <li>
+            <code>Typography</code> &ndash; Texte mit verschiedenen
+            Gr&ouml;&szlig;en (h1&ndash;h6, body1, body2)
+          </li>
+          <li><code>IconButton</code> &ndash; Buttons mit Icons</li>
+          <li>
+            <code>List</code> / <code>ListItem</code> &ndash; Auflistungen
+          </li>
+        </ul>
+
+        <div class="hint">
+          <strong>Merke:</strong> <code>npm install paketname</code> installiert
+          ein externes Paket. <strong>Axios</strong> vereinfacht HTTP-Anfragen
+          (Daten laden). <strong>MUI</strong> liefert fertige Komponenten, damit
+          du dich auf die Logik konzentrieren kannst statt auf das Styling. Das
+          <code>sx</code>-Prop bei MUI erlaubt Inline-Styling als Objekt.
+        </div>
+      </section>
+
+      <!-- ==================== Sektion 8 ==================== -->
+      <section class="card">
+        <h2>8. Jetzt bist du dran!</h2>
+
+        <p>
+          Wende dein Wissen &uuml;ber TypeScript, Hooks, Routing und externe
+          Packages in diesen drei Projekten an. Jede &Uuml;bung baut auf den
+          Konzepten aus den Sektionen 1&ndash;7 auf.
+        </p>
+
+        <div class="exercise-links">
+          <a href="tier-steckbrief.html" class="exercise-link">
+            <span class="exercise-number">1</span>
+            <div>
+              <strong>Die Tier-Steckbrief-App</strong>
+              <small
+                >Gef&uuml;hrte Aufgabe &ndash; TypeScript, useEffect, useRef
+                &amp; einfaches Routing</small
+              >
+            </div>
+          </a>
+          <a href="einkaufsliste.html" class="exercise-link">
+            <span class="exercise-number">2</span>
+            <div>
+              <strong>Die Einkaufsliste</strong>
+              <small
+                >Aufbauend &ndash; useContext, useReducer &amp; Material UI
+                Komponenten</small
+              >
+            </div>
+          </a>
+          <a href="pokemon-entdecker.html" class="exercise-link">
+            <span class="exercise-number">3</span>
+            <div>
+              <strong>Der Pok&eacute;mon-Entdecker</strong>
+              <small
+                >Komplex &ndash; Axios, Custom Hooks, dynamische Routen &amp;
+                alle Konzepte kombiniert</small
+              >
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+  </body>
+</html>

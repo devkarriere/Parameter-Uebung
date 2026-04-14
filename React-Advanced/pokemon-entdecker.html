@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>&Uuml;bung: Pok&eacute;mon-Entdecker</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- React CDN f&uuml;r Live-Demo -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      .pokemon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.8rem;
+        margin-top: 1rem;
+      }
+      .pokemon-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 2px solid #334155;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s, transform 0.2s;
+      }
+      .pokemon-card:hover {
+        border-color: #f59e0b;
+        transform: translateY(-2px);
+      }
+      .pokemon-card img {
+        width: 80px;
+        height: 80px;
+        image-rendering: pixelated;
+      }
+      .pokemon-card .name {
+        color: #e2e8f0;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: capitalize;
+        margin-top: 0.3rem;
+      }
+      .pokemon-card .id {
+        color: #64748b;
+        font-size: 0.75rem;
+      }
+      .pokemon-detail {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+      }
+      .pokemon-detail img {
+        width: 150px;
+        height: 150px;
+        image-rendering: pixelated;
+      }
+      .pokemon-detail h2 {
+        text-transform: capitalize;
+        color: #f59e0b;
+        margin: 0.5rem 0;
+      }
+      .type-badge {
+        display: inline-block;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0.2rem;
+        text-transform: capitalize;
+      }
+      .type-fire { background: #7c2d12; color: #fdba74; }
+      .type-water { background: #1e3a5f; color: #7dd3fc; }
+      .type-grass { background: #14532d; color: #86efac; }
+      .type-electric { background: #422006; color: #fde047; }
+      .type-normal { background: #334155; color: #94a3b8; }
+      .type-poison { background: #3b0764; color: #c084fc; }
+      .type-bug { background: #365314; color: #a3e635; }
+      .type-flying { background: #1e3a5f; color: #a5b4fc; }
+      .type-default { background: #334155; color: #e2e8f0; }
+      .stat-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.4rem;
+      }
+      .stat-label {
+        width: 100px;
+        text-align: right;
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-transform: capitalize;
+      }
+      .stat-track {
+        flex: 1;
+        height: 8px;
+        background: #1e293b;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .stat-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+      .stat-value {
+        width: 30px;
+        font-size: 0.8rem;
+        color: #e2e8f0;
+      }
+      .loading-pokeball {
+        text-align: center;
+        padding: 3rem;
+        font-size: 2rem;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .error-box {
+        background: #2d1215;
+        border: 1px solid #ef4444;
+        border-radius: 8px;
+        padding: 1rem;
+        color: #fca5a5;
+        text-align: center;
+      }
+      .search-input {
+        width: 100%;
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        outline: none;
+        margin-bottom: 1rem;
+      }
+      .search-input:focus {
+        border-color: #f59e0b;
+      }
+      .back-link {
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      .back-link:hover {
+        color: #e2e8f0;
+      }
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&Uuml;bung: Der Pok&eacute;mon-Entdecker</h1>
+      <p class="subtitle">
+        Axios, Custom Hooks &amp; dynamische Routen &ndash; alle Konzepte kombiniert
+      </p>
+    </header>
+
+    <main>
+      <section class="card exercise">
+        <h2>Komplexe Aufgabe: Der Pok&eacute;mon-Entdecker</h2>
+        <p>
+          Du baust eine App, die echte Pok&eacute;mon-Daten von der
+          <strong>Pok&eacute;API</strong> l&auml;dt und anzeigt. Dabei
+          kombinierst du alle bisherigen Konzepte: <code>Axios</code> f&uuml;r
+          API-Aufrufe, einen <strong>Custom Hook</strong> f&uuml;r die
+          Datenlogik und <strong>React Router</strong> mit dynamischen Routen.
+        </p>
+
+        <div class="hint">
+          <strong>Vorbereitung:</strong> Erstelle ein neues Vite-Projekt:<br />
+          <code>npm create vite@latest pokemon-entdecker -- --template react-ts</code><br />
+          <code>cd pokemon-entdecker</code><br />
+          <code>npm install</code><br />
+          <code>npm install axios react-router-dom</code><br />
+          <code>npm run dev</code>
+        </div>
+
+        <div class="hint">
+          <strong>API-Info:</strong> Die Pok&eacute;API ist kostenlos und
+          braucht keinen Schl&uuml;ssel. Die wichtigsten Endpunkte:<br />
+          <code>https://pokeapi.co/api/v2/pokemon?limit=20</code> &ndash; Liste der ersten 20 Pok&eacute;mon<br />
+          <code>https://pokeapi.co/api/v2/pokemon/1</code> &ndash; Details zu einem bestimmten Pok&eacute;mon (nach ID)
+        </div>
+
+        <!-- ======== Schritt 1 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3>TypeScript-Interfaces f&uuml;r die API-Daten</h3>
+          </div>
+          <p>
+            Erstelle die Typen in <code>src/types/index.ts</code>. Du brauchst:
+          </p>
+          <ul>
+            <li><code>PokemonListItem</code> &ndash; f&uuml;r die &Uuml;bersicht (Name + URL)</li>
+            <li><code>PokemonDetail</code> &ndash; f&uuml;r die Detailseite (ID, Name, Bild, Typen, Stats)</li>
+          </ul>
+          <p>
+            Schau dir die API-Antworten an, um die Struktur zu verstehen.
+            Du musst nicht <em>alle</em> Felder abbilden &ndash; nur die, die
+            du anzeigen willst.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/types/index.ts
+
+// F&uuml;r die Listen-Ansicht
+export interface PokemonListItem {
+  name: string;
+  url: string;
+}
+
+export interface PokemonListResponse {
+  count: number;
+  results: PokemonListItem[];
+}
+
+// F&uuml;r die Detail-Ansicht
+export interface PokemonStat {
+  base_stat: number;
+  stat: {
+    name: string;
+  };
+}
+
+export interface PokemonType {
+  type: {
+    name: string;
+  };
+}
+
+export interface PokemonDetail {
+  id: number;
+  name: string;
+  sprites: {
+    front_default: string;
+    other: {
+      "official-artwork": {
+        front_default: string;
+      };
+    };
+  };
+  types: PokemonType[];
+  stats: PokemonStat[];
+  height: number;
+  weight: number;
+}</code></pre>
+
+            <div class="hint">
+              <strong>Tipp:</strong> Du musst nicht die gesamte API-Antwort
+              abtippen. TypeScript beschwert sich nicht, wenn die API
+              <em>mehr</em> Felder liefert als du definiert hast. Definiere
+              nur die Felder, die du auch benutzt.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 2 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3>Axios einrichten</h3>
+          </div>
+          <p>
+            Erstelle eine Datei <code>src/api/pokeApi.ts</code>, in der du
+            eine <strong>Axios-Instanz</strong> mit der Basis-URL der
+            Pok&eacute;API erstellst. So musst du die URL nicht bei jedem
+            Aufruf wiederholen.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/api/pokeApi.ts
+import axios from "axios";
+
+const pokeApi = axios.create({
+  baseURL: "https://pokeapi.co/api/v2",
+});
+
+export default pokeApi;</code></pre>
+
+            <div class="hint">
+              <strong>Vorteil:</strong> Mit <code>axios.create()</code>
+              erstellst du eine vorkonfigurierte Instanz. Statt
+              <code>axios.get("https://pokeapi.co/api/v2/pokemon")</code>
+              schreibst du nur noch
+              <code>pokeApi.get("/pokemon")</code>. Das spart Tipparbeit und
+              macht den Code &uuml;bersichtlicher.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 3 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3>Custom Hook: usePokemonList</h3>
+          </div>
+          <p>
+            Erstelle den Hook <code>src/hooks/usePokemonList.ts</code>. Er soll:
+          </p>
+          <ul>
+            <li>Die ersten 20 Pok&eacute;mon von der API laden (beim ersten Anzeigen)</li>
+            <li>Einen <code>loading</code>-State haben</li>
+            <li>Einen <code>error</code>-State haben</li>
+            <li>Die Liste der Pok&eacute;mon zur&uuml;ckgeben</li>
+          </ul>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/hooks/usePokemonList.ts
+import { useState, useEffect } from "react";
+import pokeApi from "../api/pokeApi";
+import { PokemonListItem, PokemonListResponse } from "../types";
+
+function usePokemonList() {
+  const [pokemon, setPokemon] = useState&lt;PokemonListItem[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(function () {
+    pokeApi.get&lt;PokemonListResponse&gt;("/pokemon?limit=20")
+      .then(function (response) {
+        setPokemon(response.data.results);
+        setLoading(false);
+      })
+      .catch(function (err) {
+        setError("Fehler beim Laden: " + err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  return { pokemon, loading, error };
+}
+
+export default usePokemonList;</code></pre>
+
+            <div class="visual">
+              <div class="flow">
+                <span class="tag hook">usePokemonList() <small>Custom Hook</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag callback">pokeApi.get() <small>Axios-Anfrage</small></span>
+                <span class="arrow">&rarr;</span>
+                <span class="tag state">{ pokemon, loading, error } <small>R&uuml;ckgabe</small></span>
+              </div>
+              <p class="caption">
+                Der Custom Hook kapselt die gesamte Lade-Logik.
+                Die Komponente ruft nur <code>usePokemonList()</code> auf
+                und bekommt die Daten.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 4 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">4</span>
+            <h3>Custom Hook: usePokemonDetail</h3>
+          </div>
+          <p>
+            Erstelle einen zweiten Hook <code>src/hooks/usePokemonDetail.ts</code>.
+            Er bekommt eine <strong>ID oder einen Namen</strong> als Parameter
+            und l&auml;dt die Details des einzelnen Pok&eacute;mon.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/hooks/usePokemonDetail.ts
+import { useState, useEffect } from "react";
+import pokeApi from "../api/pokeApi";
+import { PokemonDetail } from "../types";
+
+function usePokemonDetail(nameOrId: string) {
+  const [pokemon, setPokemon] = useState&lt;PokemonDetail | null&gt;(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(function () {
+    setLoading(true);
+    setError("");
+
+    pokeApi.get&lt;PokemonDetail&gt;("/pokemon/" + nameOrId)
+      .then(function (response) {
+        setPokemon(response.data);
+        setLoading(false);
+      })
+      .catch(function (err) {
+        setError("Pok&eacute;mon nicht gefunden: " + err.message);
+        setLoading(false);
+      });
+  }, [nameOrId]);  // Neu laden wenn sich der Name/die ID &auml;ndert
+
+  return { pokemon, loading, error };
+}
+
+export default usePokemonDetail;</code></pre>
+
+            <div class="hint">
+              <strong>Beachte:</strong> <code>[nameOrId]</code> im
+              Abh&auml;ngigkeits-Array sorgt daf&uuml;r, dass die Daten
+              <strong>neu geladen</strong> werden, wenn du ein anderes
+              Pok&eacute;mon aufrufst. Ohne dieses Array w&uuml;rde immer
+              das erste Pok&eacute;mon angezeigt bleiben.
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 5 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">5</span>
+            <h3>Pok&eacute;mon-Liste als View</h3>
+          </div>
+          <p>
+            Erstelle <code>src/views/PokemonList/PokemonList.tsx</code>. Die
+            Seite nutzt den <code>usePokemonList</code>-Hook und zeigt eine
+            Karte pro Pok&eacute;mon. Jede Karte ist ein <code>Link</code> zur
+            Detail-Seite. F&uuml;r das Bild kannst du die URL-Formel nutzen:
+            <code>https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{id}.png</code>
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/views/PokemonList/PokemonList.tsx
+import { Link } from "react-router-dom";
+import usePokemonList from "../../hooks/usePokemonList";
+
+function PokemonList() {
+  const { pokemon, loading, error } = usePokemonList();
+
+  if (loading) return &lt;p&gt;Lade Pok&eacute;mon...&lt;/p&gt;;
+  if (error) return &lt;p style={{ color: "#ef4444" }}&gt;{error}&lt;/p&gt;;
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Pok&eacute;mon-&Uuml;bersicht&lt;/h2&gt;
+      &lt;div className="pokemon-grid"&gt;
+        {pokemon.map(function (p, index) {
+          const id = index + 1; // Die ersten 20 haben IDs 1-20
+          return (
+            &lt;Link
+              key={p.name}
+              to={"/pokemon/" + id}
+              style={{ textDecoration: "none" }}
+            &gt;
+              &lt;div className="pokemon-card"&gt;
+                &lt;img
+                  src={"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + id + ".png"}
+                  alt={p.name}
+                /&gt;
+                &lt;p className="id"&gt;#{id}&lt;/p&gt;
+                &lt;p className="name"&gt;{p.name}&lt;/p&gt;
+              &lt;/div&gt;
+            &lt;/Link&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default PokemonList;</code></pre>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 6 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">6</span>
+            <h3>Pok&eacute;mon-Detail mit dynamischer Route</h3>
+          </div>
+          <p>
+            Erstelle <code>src/views/PokemonDetail/PokemonDetail.tsx</code>.
+            Die Seite liest die <strong>ID aus der URL</strong> mit
+            <code>useParams</code>, l&auml;dt die Details mit dem
+            <code>usePokemonDetail</code>-Hook und zeigt: Bild, Name, Typen
+            (als farbige Badges) und Statuswerte (HP, Angriff etc.) als
+            Balken.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/views/PokemonDetail/PokemonDetail.tsx
+import { useParams, Link } from "react-router-dom";
+import usePokemonDetail from "../../hooks/usePokemonDetail";
+
+function getTypeClass(typeName: string): string {
+  const typeMap: Record&lt;string, string&gt; = {
+    fire: "type-fire",
+    water: "type-water",
+    grass: "type-grass",
+    electric: "type-electric",
+    normal: "type-normal",
+    poison: "type-poison",
+    bug: "type-bug",
+    flying: "type-flying",
+  };
+  return typeMap[typeName] || "type-default";
+}
+
+function getStatColor(value: number): string {
+  if (value &gt;= 100) return "#22c55e";
+  if (value &gt;= 70) return "#f59e0b";
+  if (value &gt;= 40) return "#3b82f6";
+  return "#ef4444";
+}
+
+function PokemonDetailView() {
+  const { id } = useParams();
+  const { pokemon, loading, error } = usePokemonDetail(id || "1");
+
+  if (loading) return &lt;p&gt;Lade Details...&lt;/p&gt;;
+  if (error) return &lt;p style={{ color: "#ef4444" }}&gt;{error}&lt;/p&gt;;
+  if (!pokemon) return &lt;p&gt;Nicht gefunden&lt;/p&gt;;
+
+  return (
+    &lt;div&gt;
+      &lt;Link to="/" style={{ color: "#94a3b8", textDecoration: "none" }}&gt;
+        &larr; Zur&uuml;ck zur &Uuml;bersicht
+      &lt;/Link&gt;
+
+      &lt;div className="pokemon-detail" style={{ marginTop: "1rem" }}&gt;
+        &lt;img
+          src={pokemon.sprites.other["official-artwork"].front_default}
+          alt={pokemon.name}
+        /&gt;
+        &lt;h2&gt;{pokemon.name} &lt;span style={{ color: "#64748b" }}&gt;#{pokemon.id}&lt;/span&gt;&lt;/h2&gt;
+
+        &lt;div style={{ marginBottom: "1rem" }}&gt;
+          {pokemon.types.map(function (t) {
+            return (
+              &lt;span key={t.type.name} className={"type-badge " + getTypeClass(t.type.name)}&gt;
+                {t.type.name}
+              &lt;/span&gt;
+            );
+          })}
+        &lt;/div&gt;
+
+        &lt;p style={{ color: "#94a3b8", marginBottom: "1rem" }}&gt;
+          Gr&ouml;&szlig;e: {pokemon.height / 10}m | Gewicht: {pokemon.weight / 10}kg
+        &lt;/p&gt;
+
+        &lt;div style={{ maxWidth: 400, margin: "0 auto", textAlign: "left" }}&gt;
+          {pokemon.stats.map(function (s) {
+            return (
+              &lt;div key={s.stat.name} className="stat-bar"&gt;
+                &lt;span className="stat-label"&gt;{s.stat.name}&lt;/span&gt;
+                &lt;div className="stat-track"&gt;
+                  &lt;div
+                    className="stat-fill"
+                    style={{
+                      width: Math.min(s.base_stat, 150) / 1.5 + "%",
+                      background: getStatColor(s.base_stat)
+                    }}
+                  /&gt;
+                &lt;/div&gt;
+                &lt;span className="stat-value"&gt;{s.base_stat}&lt;/span&gt;
+              &lt;/div&gt;
+            );
+          })}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default PokemonDetailView;</code></pre>
+
+            <div class="call-chain">
+              <h4>Datenfluss bei der Detail-Seite:</h4>
+              <div class="chain">
+                <div class="chain-item main-fn">
+                  URL: /pokemon/25 &rarr; useParams() &rarr; id = "25"
+                  <div class="chain-item sub-fn">
+                    usePokemonDetail("25") &rarr; useEffect
+                    <div class="chain-item sub-fn-deep">
+                      pokeApi.get("/pokemon/25") &rarr; Pikachu-Daten &rarr; setPokemon()
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Schritt 7 ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">7</span>
+            <h3>Router Setup mit Layout</h3>
+          </div>
+          <p>
+            Baue alles in <code>App.tsx</code> zusammen: Ein Layout mit
+            Header und <code>&lt;Outlet /&gt;</code>, eine
+            <strong>Index-Route</strong> f&uuml;r die Liste und eine
+            <strong>dynamische Route</strong> f&uuml;r die Detail-Seite.
+          </p>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// src/components/Layout/Layout.tsx
+import { Outlet, Link } from "react-router-dom";
+
+function Layout() {
+  return (
+    &lt;div&gt;
+      &lt;header style={{
+        textAlign: "center",
+        padding: "1rem",
+        borderBottom: "1px solid #334155"
+      }}&gt;
+        &lt;Link to="/" style={{ textDecoration: "none" }}&gt;
+          &lt;h1 style={{ color: "#f59e0b" }}&gt;Pok&eacute;mon-Entdecker&lt;/h1&gt;
+        &lt;/Link&gt;
+      &lt;/header&gt;
+
+      &lt;main style={{ maxWidth: "700px", margin: "2rem auto", padding: "0 1rem" }}&gt;
+        &lt;Outlet /&gt;
+      &lt;/main&gt;
+
+      &lt;footer style={{ textAlign: "center", color: "#475569", marginTop: "3rem" }}&gt;
+        &lt;p&gt;Pok&eacute;mon-Entdecker &copy; 2025 | Daten von Pok&eacute;API&lt;/p&gt;
+      &lt;/footer&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default Layout;</code></pre>
+
+            <pre><code>// src/App.tsx
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout/Layout";
+import PokemonList from "./views/PokemonList/PokemonList";
+import PokemonDetailView from "./views/PokemonDetail/PokemonDetail";
+
+function App() {
+  return (
+    &lt;BrowserRouter&gt;
+      &lt;Routes&gt;
+        &lt;Route path="/" element={&lt;Layout /&gt;}&gt;
+          &lt;Route index element={&lt;PokemonList /&gt;} /&gt;
+          &lt;Route path="pokemon/:id" element={&lt;PokemonDetailView /&gt;} /&gt;
+        &lt;/Route&gt;
+      &lt;/Routes&gt;
+    &lt;/BrowserRouter&gt;
+  );
+}
+
+export default App;</code></pre>
+
+            <div class="route-tree">
+              <div class="route-box layout">
+                <span class="label">Parent: Layout</span>
+                <code>&lt;Route path="/" element={&lt;Layout /&gt;}&gt;</code>
+                <div class="route-box index">
+                  <span class="label">Index</span>
+                  <code>&lt;Route index element={&lt;PokemonList /&gt;} /&gt;</code> &rarr; URL: <code>/</code>
+                </div>
+                <div class="route-box page">
+                  <span class="label">Dynamisch</span>
+                  <code>&lt;Route path="pokemon/:id" .../&gt;</code> &rarr; URL: <code>/pokemon/25</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="hint">
+              <strong>Zusammenfassung der Ordnerstruktur:</strong>
+            </div>
+
+            <div class="folder-tree">
+              <span class="folder">src/</span><br />
+              <span class="tree-line">&boxvr;&boxh;&boxh;</span> <span class="folder">api/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="file-ts">pokeApi.ts</span> <span class="comment">&larr; Axios-Instanz</span><br />
+              <span class="tree-line">&boxvr;&boxh;&boxh;</span> <span class="folder">components/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="folder">Layout/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="file-ts">Layout.tsx</span> <span class="comment">&larr; Header + Outlet</span><br />
+              <span class="tree-line">&boxvr;&boxh;&boxh;</span> <span class="folder">hooks/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span> <span class="file-ts">usePokemonList.ts</span> <span class="comment">&larr; Custom Hook</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="file-ts">usePokemonDetail.ts</span> <span class="comment">&larr; Custom Hook</span><br />
+              <span class="tree-line">&boxvr;&boxh;&boxh;</span> <span class="folder">views/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxvr;&boxh;&boxh;</span> <span class="folder">PokemonList/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="file-ts">PokemonList.tsx</span> <span class="comment">&larr; Startseite</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="folder">PokemonDetail/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="file-ts">PokemonDetail.tsx</span> <span class="comment">&larr; Detail-Seite</span><br />
+              <span class="tree-line">&boxvr;&boxh;&boxh;</span> <span class="folder">types/</span><br />
+              <span class="tree-line">&boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh;</span> <span class="file-ts">index.ts</span> <span class="comment">&larr; Alle Interfaces</span><br />
+              <span class="tree-line">&boxvr;&boxh;&boxh;</span> <span class="file-ts">App.tsx</span> <span class="comment">&larr; Router-Setup</span><br />
+              <span class="tree-line">&boxur;&boxh;&boxh;</span> <span class="file-ts">main.tsx</span>
+            </div>
+          </details>
+        </div>
+
+        <!-- ======== Bonus ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number bonus-icon">*</span>
+            <h3>Bonus: Suchfunktion &amp; Pagination</h3>
+          </div>
+          <p>
+            Erweitere die App um zwei Funktionen:
+          </p>
+          <ul>
+            <li>
+              <strong>Suche:</strong> Ein Eingabefeld, das direkt ein
+              Pok&eacute;mon nach Namen sucht (z.B. &bdquo;pikachu&ldquo;).
+              Nutze daf&uuml;r die API:
+              <code>https://pokeapi.co/api/v2/pokemon/pikachu</code>
+            </li>
+            <li>
+              <strong>Pagination:</strong> Buttons f&uuml;r
+              &bdquo;N&auml;chste 20&ldquo; und &bdquo;Vorherige 20&ldquo;.
+              Nutze den <code>offset</code>-Parameter der API:
+              <code>?limit=20&amp;offset=20</code>
+            </li>
+          </ul>
+
+          <details class="solution">
+            <summary>L&ouml;sung anzeigen</summary>
+            <pre><code>// Tipp f&uuml;r Pagination: usePokemonList erweitern
+function usePokemonList(offset: number) {
+  // ...
+  useEffect(function () {
+    setLoading(true);
+    pokeApi.get&lt;PokemonListResponse&gt;(
+      "/pokemon?limit=20&amp;offset=" + offset
+    )
+      .then(function (response) {
+        setPokemon(response.data.results);
+        setLoading(false);
+      })
+      .catch(function (err) {
+        setError("Fehler: " + err.message);
+        setLoading(false);
+      });
+  }, [offset]);  // Neu laden wenn offset sich &auml;ndert
+
+  return { pokemon, loading, error };
+}
+
+// In PokemonList.tsx:
+function PokemonList() {
+  const [offset, setOffset] = useState(0);
+  const { pokemon, loading, error } = usePokemonList(offset);
+
+  return (
+    &lt;div&gt;
+      {/* ... Pok&eacute;mon-Grid ... */}
+      &lt;div className="pagination"&gt;
+        &lt;button
+          onClick={function () { setOffset(offset - 20); }}
+          disabled={offset === 0}
+        &gt;
+          &larr; Vorherige
+        &lt;/button&gt;
+        &lt;span&gt;Seite {offset / 20 + 1}&lt;/span&gt;
+        &lt;button onClick={function () { setOffset(offset + 20); }}&gt;
+          N&auml;chste &rarr;
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </details>
+        </div>
+
+        <!-- ======== Live-Demo ======== -->
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number demo-icon">&#9654;</span>
+            <h3>Live-Demo: So sieht es aus</h3>
+          </div>
+          <p>
+            Hier siehst du eine vereinfachte Version, die echte Daten von der
+            Pok&eacute;API l&auml;dt (ohne Router, da wir im Browser arbeiten):
+          </p>
+          <div id="react-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Frontend Masterclass &ndash; Devkarriere</p>
+    </footer>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      function getTypeClass(typeName) {
+        const typeMap = {
+          fire: "type-fire", water: "type-water", grass: "type-grass",
+          electric: "type-electric", normal: "type-normal", poison: "type-poison",
+          bug: "type-bug", flying: "type-flying"
+        };
+        return typeMap[typeName] || "type-default";
+      }
+
+      function getStatColor(value) {
+        if (value >= 100) return "#22c55e";
+        if (value >= 70) return "#f59e0b";
+        if (value >= 40) return "#3b82f6";
+        return "#ef4444";
+      }
+
+      function PokemonCard({ name, id, onClick }) {
+        return (
+          <div className="pokemon-card" onClick={function () { onClick(id); }}>
+            <img
+              src={"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + id + ".png"}
+              alt={name}
+            />
+            <p className="id">#{id}</p>
+            <p className="name">{name}</p>
+          </div>
+        );
+      }
+
+      function PokemonDetailView({ id, onBack }) {
+        const [pokemon, setPokemon] = useState(null);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState("");
+
+        useEffect(function () {
+          setLoading(true);
+          setError("");
+          fetch("https://pokeapi.co/api/v2/pokemon/" + id)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              setPokemon(data);
+              setLoading(false);
+            })
+            .catch(function (err) {
+              setError("Fehler: " + err.message);
+              setLoading(false);
+            });
+        }, [id]);
+
+        if (loading) return <div className="loading-pokeball">⚡</div>;
+        if (error) return <div className="error-box">{error}</div>;
+        if (!pokemon) return null;
+
+        return (
+          <div>
+            <a className="back-link" onClick={onBack}>← Zurück zur Übersicht</a>
+            <div className="pokemon-detail" style={{ marginTop: "1rem" }}>
+              <img
+                src={pokemon.sprites.other["official-artwork"].front_default}
+                alt={pokemon.name}
+              />
+              <h2>{pokemon.name} <span style={{ color: "#64748b", fontSize: "1rem" }}>#{pokemon.id}</span></h2>
+              <div style={{ marginBottom: "1rem" }}>
+                {pokemon.types.map(function (t) {
+                  return (
+                    <span key={t.type.name} className={"type-badge " + getTypeClass(t.type.name)}>
+                      {t.type.name}
+                    </span>
+                  );
+                })}
+              </div>
+              <p style={{ color: "#94a3b8", marginBottom: "1rem" }}>
+                Größe: {pokemon.height / 10}m | Gewicht: {pokemon.weight / 10}kg
+              </p>
+              <div style={{ maxWidth: 400, margin: "0 auto", textAlign: "left" }}>
+                {pokemon.stats.map(function (s) {
+                  return (
+                    <div key={s.stat.name} className="stat-bar">
+                      <span className="stat-label">{s.stat.name}</span>
+                      <div className="stat-track">
+                        <div
+                          className="stat-fill"
+                          style={{
+                            width: Math.min(s.base_stat, 150) / 1.5 + "%",
+                            background: getStatColor(s.base_stat)
+                          }}
+                        />
+                      </div>
+                      <span className="stat-value">{s.base_stat}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [pokemonList, setPokemonList] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState("");
+        const [selectedId, setSelectedId] = useState(null);
+        const [searchTerm, setSearchTerm] = useState("");
+        const [offset, setOffset] = useState(0);
+
+        useEffect(function () {
+          setLoading(true);
+          fetch("https://pokeapi.co/api/v2/pokemon?limit=20&offset=" + offset)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              setPokemonList(data.results);
+              setLoading(false);
+            })
+            .catch(function (err) {
+              setError("Fehler: " + err.message);
+              setLoading(false);
+            });
+        }, [offset]);
+
+        if (selectedId) {
+          return (
+            <PokemonDetailView
+              id={selectedId}
+              onBack={function () { setSelectedId(null); }}
+            />
+          );
+        }
+
+        if (loading) return <div className="loading-pokeball">⚡</div>;
+        if (error) return <div className="error-box">{error}</div>;
+
+        const filtered = pokemonList.filter(function (p) {
+          return p.name.includes(searchTerm.toLowerCase());
+        });
+
+        return (
+          <div>
+            <h2 style={{ color: "#f59e0b", marginBottom: "1rem" }}>Pokémon-Entdecker</h2>
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Pokémon suchen..."
+              value={searchTerm}
+              onChange={function (e) { setSearchTerm(e.target.value); }}
+            />
+            <div className="pokemon-grid">
+              {filtered.map(function (p, index) {
+                const id = offset + index + 1;
+                return (
+                  <PokemonCard
+                    key={p.name}
+                    name={p.name}
+                    id={id}
+                    onClick={setSelectedId}
+                  />
+                );
+              })}
+            </div>
+            <div className="pagination">
+              <button
+                onClick={function () { setOffset(offset - 20); setSearchTerm(""); }}
+                disabled={offset === 0}
+                style={{ opacity: offset === 0 ? 0.5 : 1 }}
+              >
+                ← Vorherige
+              </button>
+              <span style={{ color: "#94a3b8", padding: "0.6rem" }}>
+                Seite {offset / 20 + 1}
+              </span>
+              <button onClick={function () { setOffset(offset + 20); setSearchTerm(""); }}>
+                Nächste →
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("react-root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
