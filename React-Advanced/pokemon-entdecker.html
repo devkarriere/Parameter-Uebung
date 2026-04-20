@@ -441,9 +441,15 @@ export default usePokemonDetail;</code></pre>
           <details class="solution">
             <summary>L&ouml;sung anzeigen</summary>
             <pre><code>// src/views/PokemonList/PokemonList.tsx
-import React from "react";
 import { Link } from "react-router-dom";
 import usePokemonList from "../../hooks/usePokemonList";
+
+// ID aus der URL extrahieren:
+// "https://pokeapi.co/api/v2/pokemon/4/" &rarr; 4
+function getIdFromUrl(url: string): number {
+  const parts = url.split("/");
+  return Number(parts[parts.length - 2]);
+}
 
 function PokemonList() {
   const { pokemon, loading, error } = usePokemonList();
@@ -455,8 +461,8 @@ function PokemonList() {
     &lt;div&gt;
       &lt;h2&gt;Pok&eacute;mon-&Uuml;bersicht&lt;/h2&gt;
       &lt;div className="pokemon-grid"&gt;
-        {pokemon.map(function (p, index) {
-          const id = index + 1; // Die ersten 20 haben IDs 1-20
+        {pokemon.map(function (p) {
+          const id = getIdFromUrl(p.url);
           return (
             &lt;Link
               key={p.name}
@@ -650,22 +656,24 @@ function Layout() {
 export default Layout;</code></pre>
 
             <pre><code>// src/App.tsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import PokemonList from "./views/PokemonList/PokemonList";
 import PokemonDetailView from "./views/PokemonDetail/PokemonDetail";
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: &lt;Layout /&gt;,
+    children: [
+      { index: true, element: &lt;PokemonList /&gt; },
+      { path: "pokemon/:id", element: &lt;PokemonDetailView /&gt; },
+    ],
+  },
+]);
+
 function App() {
-  return (
-    &lt;BrowserRouter&gt;
-      &lt;Routes&gt;
-        &lt;Route path="/" element={&lt;Layout /&gt;}&gt;
-          &lt;Route index element={&lt;PokemonList /&gt;} /&gt;
-          &lt;Route path="pokemon/:id" element={&lt;PokemonDetailView /&gt;} /&gt;
-        &lt;/Route&gt;
-      &lt;/Routes&gt;
-    &lt;/BrowserRouter&gt;
-  );
+  return &lt;RouterProvider router={router} /&gt;;
 }
 
 export default App;</code></pre>
@@ -739,10 +747,10 @@ export default App;</code></pre>
           <div class="hint warning">
             <strong>Achtung:</strong> F&uuml;r die Pagination musst du deinen
             <code>usePokemonList</code>-Hook aus Schritt 3 <strong>&auml;ndern</strong>.
-            Er bekommt jetzt einen <code>offset</code>-Parameter. Au&szlig;erdem
-            &auml;ndert sich die ID-Berechnung in <code>PokemonList.tsx</code>:
-            Statt <code>index + 1</code> brauchst du jetzt
-            <code>offset + index + 1</code>, damit die IDs auch auf Seite 2, 3 usw. stimmen.
+            Er bekommt jetzt einen <code>offset</code>-Parameter. Die
+            <code>getIdFromUrl</code>-Hilfsfunktion aus Schritt 5 funktioniert
+            weiterhin korrekt &ndash; sie liest die ID direkt aus der API-URL,
+            egal auf welcher Seite du bist.
           </div>
 
           <details class="solution">
@@ -788,17 +796,22 @@ function usePokemonList(offset: number = 0) {
 export default usePokemonList;</code></pre>
 
             <div class="hint">
-              <strong>ID-Berechnung:</strong> In Schritt 5 haben wir
-              <code>const id = index + 1</code> geschrieben. Das funktioniert nur
-              f&uuml;r die ersten 20 Pok&eacute;mon (Seite 1). Mit Pagination
-              &auml;ndert sich das zu <code>offset + index + 1</code>, weil auf
-              Seite 2 das erste Pok&eacute;mon die ID 21 hat (offset=20, index=0).
+              <strong>Beachte:</strong> Wir nutzen weiterhin die
+              <code>getIdFromUrl</code>-Hilfsfunktion aus Schritt 5. Dadurch
+              funktioniert die ID-Berechnung auch nach dem Filtern korrekt &ndash;
+              die ID kommt direkt aus der API-URL, nicht aus der Position im Array.
             </div>
 
             <pre><code>// src/views/PokemonList/PokemonList.tsx (ANGEPASST)
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import usePokemonList from "../../hooks/usePokemonList";
+
+// ID aus der URL extrahieren (gleiche Funktion wie in Schritt 5)
+function getIdFromUrl(url: string): number {
+  const parts = url.split("/");
+  return Number(parts[parts.length - 2]);
+}
 
 function PokemonList() {
   const [offset, setOffset] = useState(0);
@@ -825,8 +838,8 @@ function PokemonList() {
       /&gt;
 
       &lt;div className="pokemon-grid"&gt;
-        {filtered.map(function (p, index) {
-          const id = offset + index + 1;
+        {filtered.map(function (p) {
+          const id = getIdFromUrl(p.url);
           return (
             &lt;Link
               key={p.name}

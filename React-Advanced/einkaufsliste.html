@@ -546,11 +546,22 @@ function ShoppingApp() {
   const openCount = items.filter(function (i) { return !i.done; }).length;
   const doneCount = items.filter(function (i) { return i.done; }).length;
 
+  // Farben basierend auf dem Theme
+  const colors = {
+    background: theme === "dark" ? "#1e293b" : "#ffffff",
+    text: theme === "dark" ? "#e2e8f0" : "#1e293b",
+    muted: theme === "dark" ? "#94a3b8" : "#64748b",
+  };
+
   return (
     &lt;div style={{
       maxWidth: 500,
       margin: "2rem auto",
-      padding: "0 1rem"
+      padding: "1.5rem",
+      background: colors.background,
+      color: colors.text,
+      borderRadius: "12px",
+      transition: "background 0.3s, color 0.3s"
     }}&gt;
       &lt;h1&gt;🛒 Einkaufsliste&lt;/h1&gt;
       &lt;button onClick={toggleTheme}&gt;
@@ -564,14 +575,14 @@ function ShoppingApp() {
         gap: "1rem",
         marginBottom: "1rem",
         fontSize: "0.85rem",
-        color: "#94a3b8"
+        color: colors.muted
       }}&gt;
         &lt;span&gt;📋 Offen: {openCount}&lt;/span&gt;
         &lt;span&gt;✅ Erledigt: {doneCount}&lt;/span&gt;
       &lt;/div&gt;
 
       {items.length === 0 ? (
-        &lt;p style={{ textAlign: "center", color: "#64748b" }}&gt;
+        &lt;p style={{ textAlign: "center", color: colors.muted }}&gt;
           Noch keine Items. F&uuml;ge etwas hinzu!
         &lt;/p&gt;
       ) : (
@@ -606,7 +617,10 @@ export default App;</code></pre>
               ist die eigentliche App-Logik. Sie wird von <code>App</code> in
               den <code>ThemeProvider</code> eingewickelt. Das ist n&ouml;tig,
               weil <code>useTheme()</code> nur <em>innerhalb</em> des Providers
-              funktioniert.
+              funktioniert. Das <code>colors</code>-Objekt leitet die
+              konkreten Farben aus dem Theme ab &ndash; so siehst du beim
+              Klick auf den Toggle-Button sofort den Wechsel zwischen Hell
+              und Dunkel.
             </div>
           </details>
         </div>
@@ -622,23 +636,21 @@ export default App;</code></pre>
             f&uuml;r &bdquo;Alle&ldquo;, &bdquo;Obst&ldquo;,
             &bdquo;Gem&uuml;se&ldquo;, &bdquo;Milchprodukte&ldquo; und
             &bdquo;Sonstiges&ldquo;. Nur Items der gew&auml;hlten Kategorie
-            werden angezeigt. Nutze daf&uuml;r <code>useMemo</code> um die
-            Filterung effizient zu machen.
+            werden angezeigt.
           </p>
 
           <details class="solution">
             <summary>L&ouml;sung anzeigen</summary>
             <pre><code>// Innerhalb von ShoppingApp erg&auml;nzen:
-import { useReducer, useState, useMemo } from "react";
+import { useReducer, useState } from "react";
 
 const [activeFilter, setActiveFilter] = useState&lt;Category | "Alle"&gt;("Alle");
 
-const filteredItems = useMemo(function () {
-  if (activeFilter === "Alle") return items;
-  return items.filter(function (item) {
-    return item.category === activeFilter;
-  });
-}, [items, activeFilter]);
+const filteredItems = activeFilter === "Alle"
+  ? items
+  : items.filter(function (item) {
+      return item.category === activeFilter;
+    });
 
 // Im JSX &ndash; Filter-Buttons:
 &lt;div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}&gt;
