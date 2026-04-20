@@ -108,8 +108,7 @@
     <header>
       <h1>&Uuml;bung: Die Tier-Steckbrief-App</h1>
       <p class="subtitle">
-        TypeScript, useEffect, useRef &amp; Routing &ndash; Schritt f&uuml;r
-        Schritt
+        TypeScript, useState &amp; Routing &ndash; Schritt f&uuml;r Schritt
       </p>
     </header>
 
@@ -118,9 +117,8 @@
         <h2>Gef&uuml;hrte Aufgabe: Die Tier-Steckbrief-App</h2>
         <p>
           Du baust eine App, die Tier-Steckbriefe anzeigt. Dabei lernst du
-          TypeScript-Interfaces, <code>useEffect</code> zum Daten laden,
-          <code>useRef</code> f&uuml;r den Fokus auf ein Suchfeld und einfaches
-          Routing.
+          TypeScript-Interfaces, <code>useState</code> zum Filtern und einfaches
+          Routing mit <code>react-router-dom</code>.
         </p>
 
         <div class="hint">
@@ -182,10 +180,8 @@ export interface Animal {
             Erstelle eine Datei
             <code>src/components/AnimalCard/AnimalCard.tsx</code>. Die
             Komponente bekommt ein Tier-Objekt als Prop und zeigt Emoji, Name,
-            Lebensraum und ob das Tier gef&auml;hrlich ist. Wenn die Card
-            geklickt wurde, soll ebenfalls eine übergeben Funktion mit der id
-            als Parameter aufgerufen werden. Definiere ein eigenes Interface
-            f&uuml;r die Props dieser Komponente.
+            Lebensraum und ob das Tier gef&auml;hrlich ist. Definiere ein
+            eigenes Interface f&uuml;r die Props dieser Komponente.
           </p>
 
           <details class="solution">
@@ -195,15 +191,11 @@ import { Animal } from "../../types";
 
 interface AnimalCardProps {
   animal: Animal;
-  onClick: (id: number) =&gt; void;
 }
 
-function AnimalCard({ animal, onClick }: AnimalCardProps) {
+function AnimalCard({ animal }: AnimalCardProps) {
   return (
-    &lt;div
-      className="animal-card"
-      onClick={function () { onClick(animal.id); }}
-    &gt;
+    &lt;div className="animal-card"&gt;
       &lt;span className="emoji"&gt;{animal.emoji}&lt;/span&gt;
       &lt;p className="name"&gt;{animal.name}&lt;/p&gt;
       &lt;p className="info"&gt;{animal.habitat}&lt;/p&gt;
@@ -232,10 +224,10 @@ export default AnimalCard;</code></pre>
             </div>
 
             <div class="hint">
-              <strong>Beachte:</strong> <code>onClick</code> ist hier eine
-              <strong>Callback-Funktion</strong> als Prop. Der Typ
-              <code>(id: number) =&gt; void</code> bedeutet: eine Funktion, die
-              eine Zahl bekommt und nichts zur&uuml;ckgibt.
+              <strong>Beachte:</strong> Die Komponente zeigt erstmal nur Daten
+              an &ndash; sie hat noch keine Klick-Funktion. Die Navigation zur
+              Detail-Seite f&uuml;gen wir sp&auml;ter mit
+              <code>&lt;Link&gt;</code> aus <code>react-router-dom</code> hinzu.
             </div>
           </details>
         </div>
@@ -247,36 +239,42 @@ export default AnimalCard;</code></pre>
             <h3>Home-Seite mit Tier-Karten</h3>
           </div>
           <p>
-            Erstelle die Datei
-            <code>src/views/Home/Home.tsx</code>. Die Komponente soll:
+            Erstelle eine Datei <code>src/data/animals.ts</code> mit den
+            Tier-Daten. Exportiere dafür ein Array mit Objekten vom Type Animal.
+            Erstelle dann die <code>src/views/Home/Home.tsx</code>. Die
+            Home-Komponente soll:
           </p>
           <ul>
             <li>
-              Ein Array mit Tier-Daten als Konstante definieren
+              Die Tier-Daten aus <code>src/data/animals.ts</code> importieren
             </li>
             <li>
-              F&uuml;r jedes Tier eine <code>AnimalCard</code>-Komponente anzeigen
+              F&uuml;r jedes Tier eine <code>AnimalCard</code>-Komponente
+              anzeigen
             </li>
             <li>
-              Die Liste mit <code>.map()</code> durchgehen und die Karten rendern
+              Die Liste mit <code>.map()</code> durchgehen und die Karten
+              rendern
             </li>
           </ul>
 
           <details class="solution">
             <summary>L&ouml;sung anzeigen</summary>
-            <pre><code>// src/views/Home/Home.tsx
-import { Animal } from "../../types";
-import AnimalCard from "../../components/AnimalCard/AnimalCard";
+            <pre><code>// src/data/animals.ts &ndash; Tier-Daten als eigene Datei
+import { Animal } from "../types";
 
-// Unsere Tier-Daten (sp&auml;ter k&ouml;nnten die von einer API kommen)
-const animalData: Animal[] = [
+export const animalData: Animal[] = [
   { id: 1, name: "Roter Panda", emoji: "🦊", habitat: "Asien", funFact: "Schl&auml;ft bis zu 17 Stunden am Tag", dangerous: false },
   { id: 2, name: "Oktopus", emoji: "🐙", habitat: "Ozean", funFact: "Hat drei Herzen und blaues Blut", dangerous: false },
   { id: 3, name: "Honigdachs", emoji: "🦡", habitat: "Afrika", funFact: "Gilt als das furchtloseste Tier der Welt", dangerous: true },
   { id: 4, name: "Axolotl", emoji: "🦎", habitat: "Mexiko", funFact: "Kann verlorene K&ouml;rperteile nachwachsen lassen", dangerous: false },
   { id: 5, name: "Qualle", emoji: "🪼", habitat: "Ozean", funFact: "Manche Quallen sind unsterblich", dangerous: true },
   { id: 6, name: "Faultier", emoji: "🦥", habitat: "S&uuml;damerika", funFact: "Bewegt sich nur 40 Meter pro Tag", dangerous: false },
-];
+];</code></pre>
+
+            <pre><code>// src/views/Home/Home.tsx
+import AnimalCard from "../../components/AnimalCard/AnimalCard";
+import { animalData } from "../../data/animals";
 
 function Home() {
   return (
@@ -299,11 +297,12 @@ function Home() {
 export default Home;</code></pre>
 
             <div class="hint">
-              <strong>Tipp:</strong> Die Tier-Daten stehen hier direkt in der Datei.
-              In einer echten App w&uuml;rden sie sp&auml;ter von einer API geladen
-              werden. Vergiss nicht, bei <code>.map()</code> immer eine eindeutige
-              <code>key</code>-Prop zu setzen &ndash; hier nutzen wir die
-              <code>id</code> des Tieres.
+              <strong>Tipp:</strong> Die Tier-Daten stehen in einer eigenen
+              Datei <code>src/data/animals.ts</code>. So k&ouml;nnen wir sie
+              sp&auml;ter auch in anderen Komponenten importieren &ndash; zum
+              Beispiel f&uuml;r die Detail-Ansicht. Vergiss nicht, bei
+              <code>.map()</code> immer eine eindeutige <code>key</code>-Prop zu
+              setzen &ndash; hier nutzen wir die <code>id</code> des Tieres.
             </div>
           </details>
         </div>
@@ -315,8 +314,8 @@ export default Home;</code></pre>
             <h3>Suchfeld mit Filter-Funktion</h3>
           </div>
           <p>
-            F&uuml;ge ein Suchfeld zur <code>Home</code>-Komponente hinzu.
-            Ein <code>useState</code> soll den Suchbegriff speichern und die
+            F&uuml;ge ein Suchfeld zur <code>Home</code>-Komponente hinzu. Ein
+            <code>useState</code> soll den Suchbegriff speichern und die
             Tier-Liste filtern.
           </p>
 
@@ -324,6 +323,8 @@ export default Home;</code></pre>
             <summary>L&ouml;sung anzeigen</summary>
             <pre><code>// Erg&auml;nze die Imports in Home.tsx:
 import { useState } from "react";
+import AnimalCard from "../../components/AnimalCard/AnimalCard";
+import { animalData } from "../../data/animals";
 
 // Innerhalb der Home-Funktion:
 function Home() {
@@ -360,15 +361,20 @@ function Home() {
 }</code></pre>
 
             <div class="hint">
-              <strong>Warum steht <code>filteredAnimals</code> einfach so in der Funktion &ndash; ohne useEffect?</strong><br />
-              Weil es eine <strong>Berechnung aus bestehendem State</strong> ist.
-              Jedes Mal wenn sich <code>searchTerm</code> &auml;ndert, rendert React die
-              Komponente neu &ndash; und dabei wird <code>filteredAnimals</code> automatisch
-              neu berechnet. Du brauchst <code>useEffect</code> nur f&uuml;r
+              <strong
+                >Warum steht <code>filteredAnimals</code> einfach so in der
+                Funktion &ndash; ohne useEffect?</strong
+              ><br />
+              Weil es eine
+              <strong>Berechnung aus bestehendem State</strong> ist. Jedes Mal
+              wenn sich <code>searchTerm</code> &auml;ndert, rendert React die
+              Komponente neu &ndash; und dabei wird
+              <code>filteredAnimals</code> automatisch neu berechnet. Du
+              brauchst <code>useEffect</code> nur f&uuml;r
               <strong>Seiteneffekte</strong> &ndash; also Dinge, die
               <em>au&szlig;erhalb</em> von React passieren (API-Aufrufe, Timer,
-              Dokument-Titel &auml;ndern etc.). Eine Filterung ist kein Seiteneffekt,
-              sondern einfach eine Ableitung aus dem State.
+              Dokument-Titel &auml;ndern etc.). Eine Filterung ist kein
+              Seiteneffekt, sondern einfach eine Ableitung aus dem State.
             </div>
 
             <div class="visual">
@@ -386,8 +392,9 @@ function Home() {
                 >
               </div>
               <p class="caption">
-                State-&Auml;nderung &rarr; Re-Render &rarr; abgeleitete Werte werden
-                automatisch aktualisiert. Kein <code>useEffect</code> n&ouml;tig!
+                State-&Auml;nderung &rarr; Re-Render &rarr; abgeleitete Werte
+                werden automatisch aktualisiert. Kein
+                <code>useEffect</code> n&ouml;tig!
               </p>
             </div>
           </details>
@@ -416,7 +423,7 @@ function Home() {
             <li><code>useParams</code> um die ID aus der URL zu lesen</li>
             <li>
               Routing-Setup in <code>App.tsx</code> mit
-              <code>BrowserRouter</code>
+              <code>createBrowserRouter</code>
             </li>
           </ul>
 
@@ -424,16 +431,12 @@ function Home() {
             <summary>L&ouml;sung anzeigen</summary>
             <pre><code>// src/views/AnimalDetail/AnimalDetail.tsx
 import { useParams, Link } from "react-router-dom";
-import { Animal } from "../../types";
+import { animalData } from "../../data/animals";
 
-interface AnimalDetailProps {
-  animals: Animal[];
-}
-
-function AnimalDetail({ animals }: AnimalDetailProps) {
+function AnimalDetail() {
   const { id } = useParams();
 
-  const animal = animals.find(function (a) {
+  const animal = animalData.find(function (a) {
     return a.id === Number(id);
   });
 
@@ -488,25 +491,36 @@ function App() {
 }</code></pre>
 
             <div class="hint">
-              <strong>Beachte:</strong> In der <code>AnimalCard</code>-Komponente
-              musst du jetzt einen <code>&lt;Link&gt;</code> einbauen, damit bei
-              Klick zur Detail-Seite navigiert wird:
+              <strong>Beachte:</strong> In der
+              <code>AnimalCard</code>-Komponente musst du jetzt einen
+              <code>&lt;Link&gt;</code> einbauen, damit bei Klick zur
+              Detail-Seite navigiert wird:
             </div>
 
-            <pre><code>// In AnimalCard.tsx:
+            <pre><code>// Angepasste AnimalCard.tsx mit Link:
 import { Link } from "react-router-dom";
+import { Animal } from "../../types";
+
+interface AnimalCardProps {
+  animal: Animal;
+}
 
 function AnimalCard({ animal }: AnimalCardProps) {
   return (
-    &lt;Link to={"/animal/" + animal.id}&gt;
+    &lt;Link to={"/animal/" + animal.id} style={{ textDecoration: "none" }}&gt;
       &lt;div className="animal-card"&gt;
-        &lt;span&gt;{animal.emoji}&lt;/span&gt;
-        &lt;h3&gt;{animal.name}&lt;/h3&gt;
-        &lt;p&gt;{animal.habitat}&lt;/p&gt;
+        &lt;span className="emoji"&gt;{animal.emoji}&lt;/span&gt;
+        &lt;p className="name"&gt;{animal.name}&lt;/p&gt;
+        &lt;p className="info"&gt;{animal.habitat}&lt;/p&gt;
+        {animal.dangerous ? (
+          &lt;p className="info" style={{ color: "#ef4444" }}&gt;Gef&auml;hrlich!&lt;/p&gt;
+        ) : null}
       &lt;/div&gt;
     &lt;/Link&gt;
   );
-}</code></pre>
+}
+
+export default AnimalCard;</code></pre>
           </details>
         </div>
 
@@ -598,34 +612,19 @@ function App() {
         <div class="step">
           <div class="step-header">
             <span class="step-number bonus-icon">*</span>
-            <h3>Bonus: Sortierung &amp; Z&auml;hler</h3>
+            <h3>Bonus: Sortierung</h3>
           </div>
-          <p>Erweitere die App um zwei Funktionen:</p>
+          <p>Erweitere die App um eine zus&auml;tzliche Funktion:</p>
           <ul>
             <li>
               Ein <strong>Dropdown</strong> zum Sortieren der Tiere (nach Name
               A-Z, Name Z-A)
             </li>
-            <li>
-              Ein <strong>Z&auml;hler</strong>, der anzeigt, wie oft du einen
-              Steckbrief angesehen hast (nutze <code>useRef</code> f&uuml;r
-              einen Z&auml;hler, der <em>kein</em> Re-Render ausl&ouml;st)
-            </li>
           </ul>
 
           <details class="solution">
             <summary>L&ouml;sung anzeigen</summary>
-            <pre><code>// Tipp f&uuml;r den Z&auml;hler mit useRef (in AnimalCard):
-const viewCountRef = useRef(0);
-
-function handleClick() {
-  viewCountRef.current = viewCountRef.current + 1;
-  console.log("Insgesamt angesehen:", viewCountRef.current);
-}
-
-// Im JSX: &lt;Link to={...} onClick={handleClick}&gt;
-
-// Tipp f&uuml;r die Sortierung (in Home):
+            <pre><code>// Erg&auml;nze in Home.tsx:
 const [sortOrder, setSortOrder] = useState&lt;"az" | "za"&gt;("az");
 
 const sortedAnimals = [...filteredAnimals].sort(function (a, b) {
@@ -633,15 +632,25 @@ const sortedAnimals = [...filteredAnimals].sort(function (a, b) {
     return a.name.localeCompare(b.name);
   }
   return b.name.localeCompare(a.name);
-});</code></pre>
+});
+
+// Im JSX vor dem Grid:
+&lt;select
+  value={sortOrder}
+  onChange={function (e) { setSortOrder(e.target.value as "az" | "za"); }}
+&gt;
+  &lt;option value="az"&gt;Name A-Z&lt;/option&gt;
+  &lt;option value="za"&gt;Name Z-A&lt;/option&gt;
+&lt;/select&gt;
+
+// Und im .map() dann sortedAnimals statt filteredAnimals verwenden</code></pre>
 
             <div class="hint">
-              <strong>Beachte:</strong> <code>useRef</code> hat einen wichtigen
-              Unterschied zu <code>useState</code>: Wenn du den
-              <code>.current</code>-Wert &auml;nderst, wird die Komponente
-              <strong>nicht neu gerendert</strong>. Das ist perfekt f&uuml;r
-              Z&auml;hler oder andere Werte, die du nur im Hintergrund mitlaufen
-              lassen willst.
+              <strong>Beachte:</strong> Wir erstellen mit
+              <code>[...filteredAnimals]</code> eine <strong>Kopie</strong> des
+              Arrays, bevor wir sortieren. Das ist wichtig, weil
+              <code>.sort()</code> das Original-Array ver&auml;ndert &ndash; und
+              das w&uuml;rde React durcheinanderbringen.
             </div>
           </details>
         </div>
@@ -666,7 +675,7 @@ const sortedAnimals = [...filteredAnimals].sort(function (a, b) {
     </footer>
 
     <script type="text/babel">
-      const { useState, useEffect, useRef } = React;
+      const { useState } = React;
 
       const animalData = [
         {
@@ -776,44 +785,16 @@ const sortedAnimals = [...filteredAnimals].sort(function (a, b) {
       }
 
       function App() {
-        const [animals, setAnimals] = useState([]);
-        const [loading, setLoading] = useState(true);
         const [searchTerm, setSearchTerm] = useState("");
         const [selectedId, setSelectedId] = useState(null);
-        const searchRef = useRef(null);
 
-        useEffect(function () {
-          const timer = setTimeout(function () {
-            setAnimals(animalData);
-            setLoading(false);
-          }, 1000);
-          return function () {
-            clearTimeout(timer);
-          };
-        }, []);
-
-        useEffect(
-          function () {
-            if (!loading && searchRef.current) {
-              searchRef.current.focus();
-            }
-          },
-          [loading],
-        );
-
-        const filtered = animals.filter(function (a) {
+        const filtered = animalData.filter(function (a) {
           return a.name.toLowerCase().includes(searchTerm.toLowerCase());
         });
 
-        const selectedAnimal = animals.find(function (a) {
+        const selectedAnimal = animalData.find(function (a) {
           return a.id === selectedId;
         });
-
-        if (loading) {
-          return (
-            <div className="loading-spinner">🔄 Lade Tier-Steckbriefe...</div>
-          );
-        }
 
         if (selectedAnimal) {
           return (
@@ -833,7 +814,6 @@ const sortedAnimals = [...filteredAnimals].sort(function (a, b) {
             </h2>
             <div className="search-bar">
               <input
-                ref={searchRef}
                 type="text"
                 placeholder="Tier suchen..."
                 value={searchTerm}
