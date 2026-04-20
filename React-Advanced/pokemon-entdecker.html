@@ -207,6 +207,9 @@
           </p>
           <ul>
             <li><code>PokemonListItem</code> &ndash; f&uuml;r die &Uuml;bersicht (Name + URL)</li>
+            <li><code>PokemonListResponse</code> &ndash; f&uuml;r die API-Antwort der Liste (count + results-Array)</li>
+            <li><code>PokemonStat</code> &ndash; f&uuml;r einen einzelnen Statuswert (base_stat + stat-Name)</li>
+            <li><code>PokemonType</code> &ndash; f&uuml;r einen Typ-Eintrag (type-Name)</li>
             <li><code>PokemonDetail</code> &ndash; f&uuml;r die Detailseite (ID, Name, Bild, Typen, Stats)</li>
           </ul>
           <p>
@@ -438,6 +441,7 @@ export default usePokemonDetail;</code></pre>
           <details class="solution">
             <summary>L&ouml;sung anzeigen</summary>
             <pre><code>// src/views/PokemonList/PokemonList.tsx
+import React from "react";
 import { Link } from "react-router-dom";
 import usePokemonList from "../../hooks/usePokemonList";
 
@@ -606,8 +610,10 @@ export default PokemonDetailView;</code></pre>
             <h3>Router Setup mit Layout</h3>
           </div>
           <p>
-            Baue alles in <code>App.tsx</code> zusammen: Ein Layout mit
-            Header und <code>&lt;Outlet /&gt;</code>, eine
+            Erstelle zuerst eine <strong>Layout-Komponente</strong> in
+            <code>src/components/Layout/Layout.tsx</code> mit Header,
+            <code>&lt;Outlet /&gt;</code> und Footer. Baue dann in
+            <code>App.tsx</code> den Router zusammen: Eine
             <strong>Index-Route</strong> f&uuml;r die Liste und eine
             <strong>dynamische Route</strong> f&uuml;r die Detail-Seite.
           </p>
@@ -730,11 +736,37 @@ export default App;</code></pre>
             </li>
           </ul>
 
+          <div class="hint warning">
+            <strong>Achtung:</strong> F&uuml;r die Pagination musst du deinen
+            <code>usePokemonList</code>-Hook aus Schritt 3 <strong>&auml;ndern</strong>.
+            Er bekommt jetzt einen <code>offset</code>-Parameter. Au&szlig;erdem
+            &auml;ndert sich die ID-Berechnung in <code>PokemonList.tsx</code>:
+            Statt <code>index + 1</code> brauchst du jetzt
+            <code>offset + index + 1</code>, damit die IDs auch auf Seite 2, 3 usw. stimmen.
+          </div>
+
           <details class="solution">
             <summary>L&ouml;sung anzeigen</summary>
-            <pre><code>// Tipp f&uuml;r Pagination: usePokemonList erweitern
-function usePokemonList(offset: number) {
-  // ...
+
+            <div class="hint">
+              <strong>Erkl&auml;rung:</strong> In Schritt 3 hat
+              <code>usePokemonList()</code> immer die ersten 20 Pok&eacute;mon geladen.
+              Jetzt bekommt er einen <code>offset</code>-Parameter, der sagt:
+              &bdquo;&Uuml;berspringe die ersten X Pok&eacute;mon&ldquo;.
+              Dadurch wird <code>[offset]</code> zum Abh&auml;ngigkeits-Array &ndash;
+              bei jeder &Auml;nderung l&auml;dt der Hook neu.
+            </div>
+
+            <pre><code>// src/hooks/usePokemonList.ts (ANGEPASST &ndash; ersetzt Schritt 3)
+import { useState, useEffect } from "react";
+import pokeApi from "../api/pokeApi";
+import { PokemonListItem, PokemonListResponse } from "../types";
+
+function usePokemonList(offset: number = 0) {
+  const [pokemon, setPokemon] = useState&lt;PokemonListItem[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   useEffect(function () {
     setLoading(true);
     pokeApi.get&lt;PokemonListResponse&gt;(
@@ -753,14 +785,67 @@ function usePokemonList(offset: number) {
   return { pokemon, loading, error };
 }
 
-// In PokemonList.tsx:
+export default usePokemonList;</code></pre>
+
+            <div class="hint">
+              <strong>ID-Berechnung:</strong> In Schritt 5 haben wir
+              <code>const id = index + 1</code> geschrieben. Das funktioniert nur
+              f&uuml;r die ersten 20 Pok&eacute;mon (Seite 1). Mit Pagination
+              &auml;ndert sich das zu <code>offset + index + 1</code>, weil auf
+              Seite 2 das erste Pok&eacute;mon die ID 21 hat (offset=20, index=0).
+            </div>
+
+            <pre><code>// src/views/PokemonList/PokemonList.tsx (ANGEPASST)
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import usePokemonList from "../../hooks/usePokemonList";
+
 function PokemonList() {
   const [offset, setOffset] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const { pokemon, loading, error } = usePokemonList(offset);
+
+  if (loading) return &lt;p&gt;Lade Pok&eacute;mon...&lt;/p&gt;;
+  if (error) return &lt;p style={{ color: "#ef4444" }}&gt;{error}&lt;/p&gt;;
+
+  const filtered = pokemon.filter(function (p) {
+    return p.name.includes(searchTerm.toLowerCase());
+  });
 
   return (
     &lt;div&gt;
-      {/* ... Pok&eacute;mon-Grid ... */}
+      &lt;h2&gt;Pok&eacute;mon-&Uuml;bersicht&lt;/h2&gt;
+
+      &lt;input
+        className="search-input"
+        type="text"
+        placeholder="Pok&eacute;mon suchen..."
+        value={searchTerm}
+        onChange={function (e) { setSearchTerm(e.target.value); }}
+      /&gt;
+
+      &lt;div className="pokemon-grid"&gt;
+        {filtered.map(function (p, index) {
+          const id = offset + index + 1;
+          return (
+            &lt;Link
+              key={p.name}
+              to={"/pokemon/" + id}
+              style={{ textDecoration: "none" }}
+            &gt;
+              &lt;div className="pokemon-card"&gt;
+                &lt;img
+                  src={"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + id + ".png"}
+                  alt={p.name}
+                /&gt;
+                &lt;p className="id"&gt;#{id}&lt;/p&gt;
+                &lt;p className="name"&gt;{p.name}&lt;/p&gt;
+              &lt;/div&gt;
+            &lt;/Link&gt;
+          );
+        })}
+      &lt;/div&gt;
+
       &lt;div className="pagination"&gt;
         &lt;button
           onClick={function () { setOffset(offset - 20); }}
@@ -775,7 +860,19 @@ function PokemonList() {
       &lt;/div&gt;
     &lt;/div&gt;
   );
-}</code></pre>
+}
+
+export default PokemonList;</code></pre>
+
+            <div class="hint">
+              <strong>Hinweis zur Suche:</strong> Diese L&ouml;sung filtert die
+              bereits geladene Liste auf dem Client. Das funktioniert f&uuml;r die
+              aktuelle Seite (20 Pok&eacute;mon). F&uuml;r eine echte Suche
+              &uuml;ber <em>alle</em> Pok&eacute;mon k&ouml;nntest du alternativ
+              die API direkt aufrufen:
+              <code>pokeApi.get("/pokemon/" + searchTerm)</code> &ndash; das liefert
+              ein einzelnes Pok&eacute;mon nach exaktem Namen.
+            </div>
           </details>
         </div>
 
